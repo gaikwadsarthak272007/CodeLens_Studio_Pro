@@ -1,0 +1,2732 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeLens Studio Pro — Interactive DSA Visualizer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #070b14;
+      --bg-panel: rgba(15, 23, 42, 0.85);
+      --bg-card: rgba(30, 41, 59, 0.7);
+      --border-subtle: rgba(148, 163, 184, 0.16);
+      --accent-cyan: #38bdf8;
+      --accent-indigo: #818cf8;
+      --state-compare: #f59e0b;
+      --state-mutate: #ef4444;
+      --state-success: #10b981;
+      --state-visit: #a855f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: #334155 #0f172a;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-deep);
+      background-image: 
+        radial-gradient(circle at 12% 18%, rgba(56, 189, 248, 0.08), transparent 32%),
+        radial-gradient(circle at 88% 82%, rgba(129, 140, 248, 0.08), transparent 32%);
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .glass-panel {
+      background: var(--bg-panel);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .canvas-grid {
+      background-size: 28px 28px;
+      background-image: 
+        linear-gradient(to right, rgba(148, 163, 184, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.04) 1px, transparent 1px);
+    }
+
+    /* Keep oversized diagrams inside an accessible, two-axis viewport. */
+    main > section, .canvas-grid { min-width: 0; }
+    #visualStage {
+      flex: none;
+      width: 100%;
+      height: clamp(300px, 55vh, 620px);
+      min-width: 0;
+      min-height: 0;
+      overflow: auto;
+      justify-content: flex-start;
+      align-items: flex-start;
+      scrollbar-width: auto;
+      scrollbar-color: #38bdf8 #0f172a;
+    }
+    #visualStage > * {
+      flex-shrink: 0;
+      max-width: none;
+      margin: auto;
+      overflow: visible;
+    }
+    #visualStage > svg { height: auto; }
+    #visualStage::-webkit-scrollbar { width: 12px; height: 12px; }
+    #visualStage::-webkit-scrollbar-track { background: #0f172a; }
+    #visualStage::-webkit-scrollbar-thumb {
+      background: #38bdf8;
+      border: 3px solid #0f172a;
+      border-radius: 8px;
+    }
+    #visualStage::-webkit-scrollbar-corner { background: #0f172a; }
+
+    /* Code line highlight */
+    .code-line {
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+      border-left: 3px solid transparent;
+    }
+    .code-line.active-line {
+      background: rgba(56, 189, 248, 0.18);
+      border-left-color: #38bdf8;
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* Node & Bar Transitions */
+    .vis-transition {
+      transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.45); }
+      50% { box-shadow: 0 0 18px 4px rgba(56, 189, 248, 0.65); }
+    }
+    .active-glow {
+      animation: pulseGlow 1.5s infinite;
+    }
+
+    /* Custom Form Controls */
+    select, input[type="text"], input[type="number"] {
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      color: #f8fafc;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    select:focus, input:focus {
+      outline: none;
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    }
+  
+    [hidden] { display: none !important; }
+    html { color-scheme: dark; }
+    .home-shell { max-width:1160px; width:100%; margin:auto; padding:34px 24px 64px; }
+    .home-top { display:flex; align-items:center; justify-content:space-between; gap:16px; border-bottom:1px solid #253247; padding-bottom:22px; }
+    .home-logo { font-weight:800; font-size:20px; color:#e2e8f0; }
+    .home-tag { color:#67e8f9; font-size:12px; letter-spacing:2px; }
+    .home-hero { padding:60px 0 32px; max-width:760px; }
+    .home-hero h1 { font-size:clamp(36px,6vw,66px); line-height:1.1; font-weight:800; letter-spacing:-2px; margin:16px 0 22px; }
+    .home-hero h1 span { color:#38bdf8; }
+    .home-hero p { color:#a9b9cf; line-height:1.8; font-size:16px; }
+    .home-presenter { color:#67e8f9!important; font-weight:600; margin-top:18px; }
+    .lab-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; }
+    .lab-card { display:flex; flex-direction:column; text-decoration:none; color:#e2e8f0; background:linear-gradient(135deg,#131e30,#0c1423); border:1px solid #28374d; border-radius:18px; padding:26px; transition:transform .2s,border-color .2s; }
+    .lab-card:hover { transform:translateY(-4px); border-color:#38bdf8; }
+    .lab-card:focus-visible,.home-link:focus-visible { outline:3px solid #38bdf8; outline-offset:4px; }
+    .lab-icon { font-size:30px; }
+    .lab-card h2 { font-size:23px; font-weight:700; margin:18px 0 10px; }
+    .lab-card p { color:#94a3b8; line-height:1.65; font-size:14px; flex:1; }
+    .lab-card .open-label { margin-top:24px; color:#67e8f9; font-size:14px; font-weight:600; }
+    .home-link { display:inline-block; color:#67e8f9; background:#10283b; border:1px solid #285575; border-radius:9px; padding:8px 12px; text-decoration:none; font-size:13px; }
+    .home-footer { color:#64748b; font-size:12px; margin-top:30px; }
+  </style>
+</head>
+<body class="text-slate-100 select-none">
+
+  <!-- ======================= TOP NAVIGATION & 3-TIER MENU DECK ======================= -->
+<section id="homePage" class="home-shell" aria-label="Choose a data structure"><div class="home-top"><div class="home-logo" style="display:flex;align-items:center;gap:13px"><svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true" style="flex-shrink:0;filter:drop-shadow(0 0 9px #38bdf840)"><defs><linearGradient id="brandGradient" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse"><stop stop-color="#22d3ee"/><stop offset="1" stop-color="#818cf8"/></linearGradient></defs><rect x="1" y="1" width="46" height="46" rx="14" fill="#102033" stroke="url(#brandGradient)"/><path d="M24 13V23M24 23L13 34M24 23L35 34" stroke="url(#brandGradient)" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="12" r="4" fill="#67e8f9"/><circle cx="24" cy="24" r="4" fill="#38bdf8"/><circle cx="12" cy="35" r="4" fill="#818cf8"/><circle cx="36" cy="35" r="4" fill="#818cf8"/></svg><span>CodeLens Studio Pro</span></div><span class="home-tag" style="letter-spacing:1px;font-weight:700">Sarthak Gaikwad</span></div><div class="home-hero"><p class="home-tag">SEE THE MEMORY. UNDERSTAND THE CODE.</p><h1>Your algorithms.<br><span>Brought to life.</span></h1><p>Choose a data structure to open its dedicated laboratory. Explore each operation through diagrams, code and step-by-step playback.</p><p class="home-presenter">Presented by Sarthak Yogesh Gaikwad</p></div><div class="lab-cards"><a class="lab-card" href="#array"><div class="lab-icon" aria-hidden="true">▦</div><h2>Arrays</h2><p>Explore 1D, 2D and 3D arrays, indexing, and contiguous memory.</p><span class="open-label">Open laboratory →</span></a><a class="lab-card" href="#stack"><div class="lab-icon" aria-hidden="true">▤</div><h2>Stacks</h2><p>Visualize push, pop and Last-In, First-Out operations.</p><span class="open-label">Open laboratory →</span></a><a class="lab-card" href="#queue"><div class="lab-icon" aria-hidden="true">⇥</div><h2>Queues</h2><p>Explore FIFO, circular queues, deques and priority queues.</p><span class="open-label">Open laboratory →</span></a><a class="lab-card" href="#linkedlist"><div class="lab-icon" aria-hidden="true">⇄</div><h2>Linked Lists</h2><p>Follow pointers through singly, doubly and circular linked lists.</p><span class="open-label">Open laboratory →</span></a><a class="lab-card" href="#tree"><div class="lab-icon" aria-hidden="true">⑂</div><h2>Trees</h2><p>Explore binary trees, search trees and traversal algorithms.</p><span class="open-label">Open laboratory →</span></a></div><p class="home-footer">Five laboratories • One application • Dark theme</p></section>
+  <header id="labHeader" hidden class="glass-panel sticky top-0 z-30 border-b border-slate-800/80 px-4 py-3 shadow-xl">
+    <div class="max-w-[1600px] mx-auto flex flex-col gap-3">
+      
+      <a class="home-link self-start" href="#home">← Home / Choose a data structure</a><h2 id="labPageTitle" class="text-xl font-bold text-sky-300" tabindex="-1"></h2>
+      <!-- Top Row: Brand + 3-Tier Cascading Dropdowns + Complexity Badge -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <!-- Brand Logo -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20 font-extrabold text-slate-950 text-lg">
+            CL
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="font-extrabold text-base sm:text-lg tracking-tight bg-gradient-to-r from-sky-400 via-cyan-300 to-indigo-400 bg-clip-text text-transparent">
+                CodeLens Studio Pro
+              </h1>
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                Interactive Lab
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 hidden sm:block">Multi-Dimensional Data Structures & Live Algorithm Execution Engine</p>
+            <p class="text-xs sm:text-sm text-sky-300 mt-1 font-medium">Presented by <span class="font-bold text-cyan-300">Sarthak Yogesh Gaikwad</span></p>
+          </div>
+        </div>
+
+        <!-- 3-TIER CASCADING MENU SYSTEM -->
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3 flex-1 justify-center max-w-4xl">
+          <!-- Tier 1: Data Structure -->
+          <div class="flex flex-col min-w-[165px] flex-1">
+            <label for="dsSelect" class="text-[10px] font-semibold uppercase tracking-wider text-sky-400 mb-1">
+              1. Data Structure
+            </label>
+            <select id="dsSelect" class="rounded-lg px-3 py-2 text-xs sm:text-sm font-semibold cursor-pointer">
+              <option value="array">📊 Array</option>
+              <option value="stack">📚 Stack (LIFO)</option>
+              <option value="queue">🚦 Queue (FIFO)</option>
+              <option value="linkedlist">🔗 Linked List</option>
+              <option value="tree">🌳 Binary Tree</option>
+            </select>
+          </div>
+
+          <!-- Tier 2: Subtype -->
+          <div class="flex flex-col min-w-[200px] flex-1">
+            <label for="subtypeSelect" class="text-[10px] font-semibold uppercase tracking-wider text-indigo-400 mb-1">
+              2. Structure Subtype
+            </label>
+            <select id="subtypeSelect" class="rounded-lg px-3 py-2 text-xs sm:text-sm font-semibold cursor-pointer"></select>
+          </div>
+
+          <!-- Tier 3: Operation -->
+          <div class="flex flex-col min-w-[215px] flex-1">
+            <label for="opSelect" class="text-[10px] font-semibold uppercase tracking-wider text-emerald-400 mb-1">
+              3. Operation to Perform
+            </label>
+            <select id="opSelect" class="rounded-lg px-3 py-2 text-xs sm:text-sm font-semibold cursor-pointer"></select>
+          </div>
+        </div>
+
+        <!-- Complexity & Status Pill -->
+        <div class="hidden xl:flex items-center gap-2 bg-slate-900/90 border border-slate-800 px-3 py-2 rounded-xl">
+          <div class="text-right">
+            <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Complexity</div>
+            <div id="complexityBadge" class="mono text-xs font-bold text-amber-400">Time: O(n) | Space: O(1)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Second Row: Custom Dataset Loader & Context-Aware Operation Parameters -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 pt-2 border-t border-slate-800/80 items-end">
+        
+        <!-- Custom Dataset Loader (5 cols) -->
+        <div class="lg:col-span-5 flex flex-wrap sm:flex-nowrap items-end gap-2 bg-slate-900/60 p-2 rounded-xl border border-slate-800/80">
+          <div class="flex-1 min-w-[160px]">
+            <label for="datasetInput" class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">
+              Custom Dataset (Comma-Separated Values)
+            </label>
+            <input id="datasetInput" type="text" placeholder="e.g. 15, 42, 8, 23, 67, 4" 
+              class="w-full rounded-lg px-2.5 py-1.5 text-xs mono" />
+          </div>
+          <button id="loadDataBtn" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700 text-xs font-semibold transition whitespace-nowrap">
+            📥 Load Data
+          </button>
+          <button id="randomDataBtn" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 text-xs font-semibold transition whitespace-nowrap">
+            🎲 Randomize
+          </button>
+        </div>
+
+        <!-- Context-Aware Operation Parameters & Execute Button (7 cols) -->
+        <div class="lg:col-span-7 flex flex-wrap items-end gap-2 bg-slate-900/60 p-2 rounded-xl border border-slate-800/80">
+          
+          <!-- Primary Value / Target Input -->
+          <div id="paramValWrap" class="flex-1 min-w-[110px]">
+            <label id="paramValLabel" for="paramValInput" class="block text-[10px] font-semibold uppercase tracking-wider text-amber-400 mb-1">
+              Value / Target
+            </label>
+            <input id="paramValInput" type="number" value="42" 
+              class="w-full rounded-lg px-2.5 py-1.5 text-xs mono font-bold" />
+          </div>
+
+          <!-- Index / K / Pos Input -->
+          <div id="paramIdxWrap" class="w-24">
+            <label id="paramIdxLabel" for="paramIdxInput" class="block text-[10px] font-semibold uppercase tracking-wider text-cyan-400 mb-1">
+              Index / K
+            </label>
+            <input id="paramIdxInput" type="number" value="2" min="0"
+              class="w-full rounded-lg px-2.5 py-1.5 text-xs mono font-bold" />
+          </div>
+
+          <!-- Depth (for 3D) -->
+          <div id="paramDepthWrap" class="w-20 hidden">
+            <label for="paramDepthInput" class="block text-[10px] font-semibold uppercase tracking-wider text-purple-400 mb-1">
+              Depth [d]
+            </label>
+            <input id="paramDepthInput" type="number" value="0" min="0" max="2"
+              class="w-full rounded-lg px-2.5 py-1.5 text-xs mono font-bold" />
+          </div>
+
+          <!-- Row (for 2D/3D) -->
+          <div id="paramRowWrap" class="w-20 hidden">
+            <label for="paramRowInput" class="block text-[10px] font-semibold uppercase tracking-wider text-pink-400 mb-1">
+              Row [r]
+            </label>
+            <input id="paramRowInput" type="number" value="1" min="0" max="4"
+              class="w-full rounded-lg px-2.5 py-1.5 text-xs mono font-bold" />
+          </div>
+
+          <!-- Col (for 2D/3D) -->
+          <div id="paramColWrap" class="w-20 hidden">
+            <label for="paramColInput" class="block text-[10px] font-semibold uppercase tracking-wider text-emerald-400 mb-1">
+              Col [c]
+            </label>
+            <input id="paramColInput" type="number" value="1" min="0" max="4"
+              class="w-full rounded-lg px-2.5 py-1.5 text-xs mono font-bold" />
+          </div>
+
+          <!-- Execute & Store Action Button -->
+          <button id="executeBtn" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-sky-400 to-indigo-500 hover:from-sky-300 hover:to-indigo-400 text-slate-950 font-extrabold text-xs sm:text-sm shadow-lg shadow-sky-500/20 transition flex items-center gap-1.5 whitespace-nowrap">
+            <span>⚡ Execute &amp; Store</span>
+          </button>
+
+          <!-- Toast / Feedback Pill -->
+          <div id="feedbackToast" class="hidden text-xs px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-medium"></div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================= MAIN WORKSPACE GRID ======================= -->
+  <main id="labWorkspace" hidden class="max-w-[1600px] w-full mx-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 overflow-hidden">
+    
+    <!-- LEFT / CENTER PANEL: GRAPHICAL VISUALIZATION STAGE (8 COLS) -->
+    <section class="lg:col-span-8 flex flex-col gap-3 min-h-[540px]">
+      
+      <!-- Step Narration & Frame Status Banner -->
+      <div class="glass-panel rounded-xl p-3.5 border-l-4 border-l-sky-400 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3 flex-1 min-w-[240px]">
+          <span id="stepBadge" class="mono text-xs font-extrabold px-2.5 py-1 rounded-md bg-sky-500/20 text-sky-300 border border-sky-500/30 whitespace-nowrap">
+            Step 1 / 1
+          </span>
+          <p id="stepExplanation" class="text-xs sm:text-sm font-medium text-slate-100 leading-snug">
+            Ready. Choose a data structure, subtype, and operation, then click Execute &amp; Store.
+          </p>
+        </div>
+
+        <!-- Playback Controls Bar -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <button id="firstBtn" title="First Step" class="px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-xs font-semibold border border-slate-700 transition">
+            ⏮
+          </button>
+          <button id="prevBtn" title="Previous Step" class="px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-xs font-semibold border border-slate-700 transition">
+            ◀ Prev
+          </button>
+          <button id="playBtn" class="px-3.5 py-1.5 rounded-lg bg-sky-400 hover:bg-sky-300 text-slate-950 text-xs font-extrabold transition min-w-[78px]">
+            ▶ Play
+          </button>
+          <button id="nextBtn" title="Next Step" class="px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-xs font-semibold border border-slate-700 transition">
+            Next ▶
+          </button>
+          <button id="lastBtn" title="Last Step" class="px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-xs font-semibold border border-slate-700 transition">
+            ⏭
+          </button>
+
+          <div class="flex items-center gap-1.5 ml-2 bg-slate-900/90 px-2.5 py-1 rounded-lg border border-slate-800">
+            <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Speed</span>
+            <input id="speedSlider" type="range" min="120" max="1200" value="680" class="w-20 accent-sky-400 cursor-pointer" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Interactive Graphical Stage -->
+      <div class="glass-panel canvas-grid rounded-2xl flex-1 flex flex-col justify-between p-4 relative overflow-hidden min-h-[390px]">
+        
+        <!-- Subtype Header Tag inside Canvas -->
+        <div class="flex flex-wrap items-center justify-between gap-2 z-10 border-b border-slate-800/70 pb-2.5">
+          <div class="flex items-center gap-2">
+            <span id="canvasTitleBadge" class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              1D Single-Dimensional Array
+            </span>
+            <span id="canvasMetaInfo" class="text-xs text-slate-400 mono">Size: 6 elements</span>
+          </div>
+          <!-- Color Legend -->
+          <div class="flex flex-wrap items-center gap-3 text-[11px] text-slate-300">
+            <span class="flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-sm bg-sky-400 inline-block"></i>Default</span>
+            <span class="flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-sm bg-amber-400 inline-block"></i>Active / Comparing</span>
+            <span class="flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-sm bg-rose-500 inline-block"></i>Mutating / Swapping</span>
+            <span class="flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-sm bg-emerald-400 inline-block"></i>Found / Inserted / Sorted</span>
+            <span class="flex items-center gap-1.5"><i class="w-2.5 h-2.5 rounded-sm bg-purple-400 inline-block"></i>Visited / Traversed</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Visual Stage Container -->
+        <div id="visualStage" tabindex="0" role="region" aria-label="Graphical representation, scroll to explore the diagram" class="flex-1 flex items-center justify-center overflow-auto py-4 px-2"></div>
+
+        <!-- Bottom Output / Traversal Sequence Tray -->
+        <div class="z-10 bg-slate-900/90 border border-slate-800/90 rounded-xl px-3.5 py-2 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2 overflow-x-auto">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 whitespace-nowrap">
+              Result / Traversal Output:
+            </span>
+            <div id="outputTray" class="mono text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+              —
+            </div>
+          </div>
+          <div id="persistentHint" class="text-[11px] text-slate-400">
+            State persists across operations
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- RIGHT PANEL: LIVE SYNCHRONIZED CODE & VARIABLE INSPECTOR (4 COLS) -->
+    <aside class="lg:col-span-4 flex flex-col gap-3">
+      
+      <!-- Live Code Execution Panel -->
+      <div class="glass-panel rounded-2xl p-4 flex flex-col flex-1 min-h-[280px]">
+        <div class="flex items-center justify-between mb-2.5">
+          <span class="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+            <span>💻 Synchronized Algorithm Code</span>
+          </span>
+          <span id="opNameTag" class="mono text-[11px] text-slate-400">linearSearch()</span>
+        </div>
+        <div id="codeBox" class="mono text-xs bg-slate-950/90 border border-slate-800/90 rounded-xl py-2.5 overflow-x-auto flex-1 space-y-0.5"></div>
+      </div>
+
+      <!-- Watched Variables & Pointer Inspector -->
+      <div class="glass-panel rounded-2xl p-4 flex flex-col">
+        <div class="flex items-center justify-between mb-2.5">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-400">
+            🔍 Watched Variables &amp; Pointers
+          </span>
+          <span class="text-[11px] text-slate-400">Live Frame State</span>
+        </div>
+        <div id="varsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- ======================= APPLICATION ENGINE SCRIPT ======================= -->
+  <script>
+    /***************************************************************************
+     * 1. PERSISTENT DATA STRUCTURE STORE
+     * Holds the live state for every subtype so user operations mutate & persist.
+     ***************************************************************************/
+    const STATE_STORE = {
+      // Arrays
+      "1d": [18, 42, 11, 65, 29, 53, 37],
+      "2d": [
+        [12, 25, 38, 41],
+        [54, 67, 19, 82],
+        [33, 49, 76, 90]
+      ],
+      "3d": [
+        [[10, 24, 31], [45, 52, 68]],
+        [[17, 88, 29], [63, 71, 95]],
+        [[34, 42, 59], [81, 14, 27]]
+      ],
+      // Stacks
+      "array_stack": [15, 30, 45, 60],
+      "linked_stack": [15, 30, 45, 60], // top is last element for uniform helper, rendered top-first
+      // Queues
+      "simple_queue": [22, 38, 51, 74],
+      "circular_queue": {
+        buffer: [25, 40, 55, 70, null, null, null, null],
+        front: 0,
+        rear: 3,
+        size: 4,
+        capacity: 8
+      },
+      "deque": [19, 34, 62, 85],
+      "priority_queue": [12, 28, 45, 67], // kept sorted ascending (Min-Priority Queue)
+      // Linked Lists
+      "singly": [14, 28, 42, 56, 70],
+      "doubly": [14, 28, 42, 56],
+      "circular": [10, 25, 40, 65],
+      // Trees (stored as array of values; BST builds via BST rules, Complete Tree via level-order index)
+      "bst": [50, 30, 70, 20, 40, 60, 80],
+      "complete_tree": [15, 28, 36, 49, 52, 64, 78]
+    };
+
+    /***************************************************************************
+     * 2. THREE-TIER MENU CONFIGURATION REGISTRY
+     ***************************************************************************/
+    const MENU_CONFIG = {
+      array: {
+        label: "Array",
+        subtypes: {
+          "1d": {
+            label: "Single-Dimensional Array (1D)",
+            operations: [
+              { id: "insert_idx", name: "Insert at Index", params: ["val", "idx"], time: "O(n)", space: "O(1)" },
+              { id: "delete_idx", name: "Delete at Index", params: ["idx"], time: "O(n)", space: "O(1)" },
+              { id: "update_idx", name: "Update Value at Index", params: ["val", "idx"], time: "O(1)", space: "O(1)" },
+              { id: "linear_search", name: "Linear Search (Find Element)", params: ["val"], time: "O(n)", space: "O(1)" },
+              { id: "binary_search", name: "Binary Search (Auto-Sorted)", params: ["val"], time: "O(log n)", space: "O(1)" },
+              { id: "bubble_sort", name: "Bubble Sort", params: [], time: "O(n²)", space: "O(1)" },
+              { id: "selection_sort", name: "Selection Sort", params: [], time: "O(n²)", space: "O(1)" },
+              { id: "insertion_sort", name: "Insertion Sort", params: [], time: "O(n²)", space: "O(1)" },
+              { id: "quick_sort", name: "Quick Sort", params: [], time: "O(n log n)", space: "O(log n)" },
+              { id: "rotate_left", name: "Left Rotate by K Steps", params: ["idx"], idxLabel: "Rotate K", time: "O(n)", space: "O(1)" },
+              { id: "rotate_right", name: "Right Rotate by K Steps", params: ["idx"], idxLabel: "Rotate K", time: "O(n)", space: "O(1)" }
+            ]
+          },
+          "2d": {
+            label: "Two-Dimensional Array (2D Matrix)",
+            operations: [
+              { id: "update_2d", name: "Insert / Update Cell [row][col]", params: ["val", "row", "col"], time: "O(1)", space: "O(1)" },
+              { id: "search_2d", name: "Search Element in 2D Matrix", params: ["val"], time: "O(R × C)", space: "O(1)" },
+              { id: "row_major", name: "Row-Major Traversal", params: [], time: "O(R × C)", space: "O(1)" },
+              { id: "col_major", name: "Column-Major Traversal", params: [], time: "O(R × C)", space: "O(1)" },
+              { id: "spiral_2d", name: "Spiral Order Traversal", params: [], time: "O(R × C)", space: "O(1)" }
+            ]
+          },
+          "3d": {
+            label: "Three-Dimensional Array (3D Tensor)",
+            operations: [
+              { id: "update_3d", name: "Update Cell [depth][row][col]", params: ["val", "depth", "row", "col"], time: "O(1)", space: "O(1)" },
+              { id: "search_3d", name: "Search Element Across 3D Layers", params: ["val"], time: "O(D×R×C)", space: "O(1)" },
+              { id: "traverse_3d", name: "Layer-by-Layer 3D Traversal", params: [], time: "O(D×R×C)", space: "O(1)" }
+            ]
+          }
+        }
+      },
+
+      stack: {
+        label: "Stack (LIFO)",
+        subtypes: {
+          "array_stack": {
+            label: "Array-Backed Stack",
+            operations: [
+              { id: "push", name: "Push Element onto Top", params: ["val"], time: "O(1)", space: "O(1)" },
+              { id: "pop", name: "Pop Element from Top", params: [], time: "O(1)", space: "O(1)" },
+              { id: "peek", name: "Peek Top Element", params: [], time: "O(1)", space: "O(1)" },
+              { id: "search_stack", name: "Search Element from Top", params: ["val"], time: "O(n)", space: "O(1)" }
+            ]
+          },
+          "linked_stack": {
+            label: "Linked-List Stack",
+            operations: [
+              { id: "push", name: "Push Node at Top (Head)", params: ["val"], time: "O(1)", space: "O(1)" },
+              { id: "pop", name: "Pop Node from Top (Head)", params: [], time: "O(1)", space: "O(1)" },
+              { id: "peek", name: "Peek Top Node", params: [], time: "O(1)", space: "O(1)" },
+              { id: "search_stack", name: "Search Element in Linked Stack", params: ["val"], time: "O(n)", space: "O(1)" }
+            ]
+          }
+        }
+      },
+
+      queue: {
+        label: "Queue (FIFO)",
+        subtypes: {
+          "simple_queue": {
+            label: "Simple Linear Queue",
+            operations: [
+              { id: "enqueue", name: "Enqueue Element (Rear)", params: ["val"], time: "O(1)", space: "O(1)" },
+              { id: "dequeue", name: "Dequeue Element (Front)", params: [], time: "O(1)", space: "O(1)" },
+              { id: "peek_queue", name: "Peek Front Element", params: [], time: "O(1)", space: "O(1)" },
+              { id: "search_queue", name: "Search Element in Queue", params: ["val"], time: "O(n)", space: "O(1)" }
+            ]
+          },
+          "circular_queue": {
+            label: "Circular Queue (Ring Buffer)",
+            operations: [
+              { id: "enqueue_circ", name: "Circular Enqueue (Rear = (Rear+1)%N)", params: ["val"], time: "O(1)", space: "O(1)" },
+              { id: "dequeue_circ", name: "Circular Dequeue (Front = (Front+1)%N)", params: [], time: "O(1)", space: "O(1)" },
+              { id: "peek_circ", name: "Peek Circular Front", params: [], time: "O(1)", space: "O(1)" },
+              { id: "search_circ", name: "Search Element in Ring Buffer", params: ["val"], time: "O(n)", space: "O(1)" }
+            ]
+          },
+          "deque": {
+            label: "Double-Ended Queue (Open-Ended Deque)",
+            operations: [
+              { id: "insert_front", name: "Insert at Front (Left)", params: ["val"], time: "O(1)", space: "O(1)" },
+              { id: "insert_rear", name: "Insert at Rear (Right)", params: ["val"], time: "O(1)", space: "O(1)" },
+              { id: "delete_front", name: "Delete from Front (Left)", params: [], time: "O(1)", space: "O(1)" },
+              { id: "delete_rear", name: "Delete from Rear (Right)", params: [], time: "O(1)", space: "O(1)" },
+              { id: "search_queue", name: "Search Element in Deque", params: ["val"], time: "O(n)", space: "O(1)" }
+            ]
+          },
+          "priority_queue": {
+            label: "Priority Queue (Min-Priority Ordered)",
+            operations: [
+              { id: "enqueue_pq", name: "Enqueue with Priority Order", params: ["val"], time: "O(n)", space: "O(1)" },
+              { id: "dequeue", name: "Extract Highest Priority (Min)", params: [], time: "O(1)", space: "O(1)" },
+              { id: "peek_queue", name: "Peek Highest Priority Element", params: [], time: "O(1)", space: "O(1)" },
+              { id: "search_queue", name: "Search Element in Priority Queue", params: ["val"], time: "O(n)", space: "O(1)" }
+            ]
+          }
+        }
+      },
+
+      linkedlist: {
+        label: "Linked List",
+        subtypes: {
+          "singly": {
+            label: "Singly Linked List (SLL)",
+            operations: [
+              { id: "insert_head", name: "Insert Node at Head", params: ["val"], time: "O(1)", space: "O(1)" },
+              { id: "insert_tail", name: "Insert Node at Tail", params: ["val"], time: "O(n)", space: "O(1)" },
+              { id: "insert_at", name: "Insert Node at Index", params: ["val", "idx"], time: "O(n)", space: "O(1)" },
+              { id: "delete_val", name: "Delete Node by Value", params: ["val"], time: "O(n)", space: "O(1)" },
+              { id: "delete_at", name: "Delete Node at Index", params: ["idx"], time: "O(n)", space: "O(1)" },
+              { id: "search_ll", name: "Search Element in List", params: ["val"], time: "O(n)", space: "O(1)" },
+              { id: "traverse_ll", name: "Traverse List (Head to NULL)", params: [], time: "O(n)", space: "O(1)" }
+            ]
+          },
+          "doubly": {
+            label: "Doubly Linked List (DLL)",
+            operations: [
+              { id: "insert_head", name: "Insert Node at Head (Prev/Next)", params: ["val"], time: "O(1)", space: "O(1)" },
+              { id: "insert_tail", name: "Insert Node at Tail (Prev/Next)", params: ["val"], time: "O(n)", space: "O(1)" },
+              { id: "insert_at", name: "Insert Node at Index", params: ["val", "idx"], time: "O(n)", space: "O(1)" },
+              { id: "delete_val", name: "Delete Node by Value", params: ["val"], time: "O(n)", space: "O(1)" },
+              { id: "delete_at", name: "Delete Node at Index", params: ["idx"], time: "O(n)", space: "O(1)" },
+              { id: "search_ll", name: "Search Element (Bidirectional)", params: ["val"], time: "O(n)", space: "O(1)" },
+              { id: "traverse_ll", name: "Traverse Doubly List", params: [], time: "O(n)", space: "O(1)" }
+            ]
+          },
+          "circular": {
+            label: "Circular Linked List (CLL)",
+            operations: [
+              { id: "insert_head", name: "Insert at Head & Update Tail Link", params: ["val"], time: "O(n)", space: "O(1)" },
+              { id: "insert_tail", name: "Insert at Tail (Points to Head)", params: ["val"], time: "O(n)", space: "O(1)" },
+              { id: "insert_at", name: "Insert at Index", params: ["val", "idx"], time: "O(n)", space: "O(1)" },
+              { id: "delete_val", name: "Delete Node by Value", params: ["val"], time: "O(n)", space: "O(1)" },
+              { id: "delete_at", name: "Delete Node at Index", params: ["idx"], time: "O(n)", space: "O(1)" },
+              { id: "search_ll", name: "Search Element in Cycle", params: ["val"], time: "O(n)", space: "O(1)" },
+              { id: "traverse_ll", name: "Circular Traversal (Full Cycle)", params: [], time: "O(n)", space: "O(1)" }
+            ]
+          }
+        }
+      },
+
+      tree: {
+        label: "Binary Tree",
+        subtypes: {
+          "bst": {
+            label: "Binary Search Tree (BST)",
+            operations: [
+              { id: "insert_tree", name: "Insert Node (BST Property)", params: ["val"], time: "O(log n)", space: "O(h)" },
+              { id: "delete_tree", name: "Delete Node by Value", params: ["val"], time: "O(log n)", space: "O(h)" },
+              { id: "search_tree", name: "Search Element in BST", params: ["val"], time: "O(log n)", space: "O(1)" },
+              { id: "inorder", name: "In-Order Traversal (Left-Root-Right)", params: [], time: "O(n)", space: "O(h)" },
+              { id: "preorder", name: "Pre-Order Traversal (Root-Left-Right)", params: [], time: "O(n)", space: "O(h)" },
+              { id: "postorder", name: "Post-Order Traversal (Left-Right-Root)", params: [], time: "O(n)", space: "O(h)" },
+              { id: "levelorder", name: "Level-Order Traversal (BFS Queue)", params: [], time: "O(n)", space: "O(w)" }
+            ]
+          },
+          "complete_tree": {
+            label: "Complete Binary Tree",
+            operations: [
+              { id: "insert_tree", name: "Insert Node (Level-Order Next Slot)", params: ["val"], time: "O(1)", space: "O(1)" },
+              { id: "delete_tree", name: "Delete Element (Swap with Last)", params: ["val"], time: "O(n)", space: "O(1)" },
+              { id: "search_tree", name: "BFS Search Element", params: ["val"], time: "O(n)", space: "O(w)" },
+              { id: "inorder", name: "In-Order Traversal (DFS)", params: [], time: "O(n)", space: "O(h)" },
+              { id: "preorder", name: "Pre-Order Traversal (DFS)", params: [], time: "O(n)", space: "O(h)" },
+              { id: "postorder", name: "Post-Order Traversal (DFS)", params: [], time: "O(n)", space: "O(h)" },
+              { id: "levelorder", name: "Level-Order Traversal (BFS)", params: [], time: "O(n)", space: "O(w)" }
+            ]
+          }
+        }
+      }
+    };
+
+    /***************************************************************************
+     * 3. CODE TEMPLATES FOR SYNCHRONIZED LINE HIGHLIGHTING
+     ***************************************************************************/
+    const CODE_SNIPPETS = {
+      insert_idx: [
+        "function insertAt(arr, index, value) {",
+        "  for (let i = arr.length; i > index; i--) {",
+        "    arr[i] = arr[i - 1]; // Shift elements right",
+        "  }",
+        "  arr[index] = value;    // Store new value",
+        "  return arr;",
+        "}"
+      ],
+      delete_idx: [
+        "function deleteAt(arr, index) {",
+        "  const removed = arr[index];",
+        "  for (let i = index; i < arr.length - 1; i++) {",
+        "    arr[i] = arr[i + 1]; // Shift elements left",
+        "  }",
+        "  arr.pop();             // Resize array",
+        "  return removed;",
+        "}"
+      ],
+      update_idx: [
+        "function updateAt(arr, index, newValue) {",
+        "  if (index < 0 || index >= arr.length) return;",
+        "  const oldVal = arr[index];",
+        "  arr[index] = newValue; // Direct O(1) memory write",
+        "  return arr;",
+        "}"
+      ],
+      linear_search: [
+        "function linearSearch(arr, target) {",
+        "  for (let i = 0; i < arr.length; i++) {",
+        "    if (arr[i] === target) {",
+        "      return i; // Element found at index i",
+        "    }",
+        "  }",
+        "  return -1; // Target not present",
+        "}"
+      ],
+      binary_search: [
+        "function binarySearch(arr, target) {",
+        "  let low = 0, high = arr.length - 1;",
+        "  while (low <= high) {",
+        "    let mid = Math.floor((low + high) / 2);",
+        "    if (arr[mid] === target) return mid;",
+        "    else if (arr[mid] < target) low = mid + 1;",
+        "    else high = mid - 1;",
+        "  }",
+        "  return -1;",
+        "}"
+      ],
+      bubble_sort: [
+        "function bubbleSort(arr) {",
+        "  for (let i = 0; i < arr.length - 1; i++) {",
+        "    for (let j = 0; j < arr.length - i - 1; j++) {",
+        "      if (arr[j] > arr[j + 1]) {",
+        "        [arr[j], arr[j+1]] = [arr[j+1], arr[j]];",
+        "      }",
+        "    }",
+        "  }",
+        "}"
+      ],
+      selection_sort: [
+        "function selectionSort(arr) {",
+        "  for (let i = 0; i < arr.length - 1; i++) {",
+        "    let minIdx = i;",
+        "    for (let j = i + 1; j < arr.length; j++) {",
+        "      if (arr[j] < arr[minIdx]) minIdx = j;",
+        "    }",
+        "    [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];",
+        "  }",
+        "}"
+      ],
+      insertion_sort: [
+        "function insertionSort(arr) {",
+        "  for (let i = 1; i < arr.length; i++) {",
+        "    let key = arr[i], j = i - 1;",
+        "    while (j >= 0 && arr[j] > key) {",
+        "      arr[j + 1] = arr[j]; j--;",
+        "    }",
+        "    arr[j + 1] = key;",
+        "  }",
+        "}"
+      ],
+      quick_sort: [
+        "function quickSort(arr, low, high) {",
+        "  if (low >= high) return;",
+        "  let pivot = arr[high], i = low;",
+        "  for (let j = low; j < high; j++) {",
+        "    if (arr[j] < pivot) { swap(arr, i, j); i++; }",
+        "  }",
+        "  swap(arr, i, high);",
+        "  quickSort(arr, low, i - 1); quickSort(arr, i + 1, high);",
+        "}"
+      ],
+      rotate_left: [
+        "function rotateLeftByK(arr, k) {",
+        "  k = k % arr.length;",
+        "  for (let step = 0; step < k; step++) {",
+        "    let first = arr.shift();",
+        "    arr.push(first); // Wrap around to tail",
+        "  }",
+        "}"
+      ],
+      rotate_right: [
+        "function rotateRightByK(arr, k) {",
+        "  k = k % arr.length;",
+        "  for (let step = 0; step < k; step++) {",
+        "    let last = arr.pop();",
+        "    arr.unshift(last); // Wrap around to head",
+        "  }",
+        "}"
+      ],
+      update_2d: [
+        "function updateMatrix(matrix, row, col, val) {",
+        "  // Address = Base + (row * numCols + col) * size",
+        "  const prev = matrix[row][col];",
+        "  matrix[row][col] = val;",
+        "  return matrix;",
+        "}"
+      ],
+      search_2d: [
+        "function searchMatrix(matrix, target) {",
+        "  for (let r = 0; r < matrix.length; r++) {",
+        "    for (let c = 0; c < matrix[0].length; c++) {",
+        "      if (matrix[r][c] === target) return [r, c];",
+        "    }",
+        "  }",
+        "  return [-1, -1];",
+        "}"
+      ],
+      row_major: [
+        "function rowMajorTraversal(matrix) {",
+        "  for (let r = 0; r < rows; r++) {",
+        "    for (let c = 0; c < cols; c++) {",
+        "      visit(matrix[r][c]); // Scan across row r",
+        "    }",
+        "  }",
+        "}"
+      ],
+      col_major: [
+        "function colMajorTraversal(matrix) {",
+        "  for (let c = 0; c < cols; c++) {",
+        "    for (let r = 0; r < rows; r++) {",
+        "      visit(matrix[r][c]); // Scan down column c",
+        "    }",
+        "  }",
+        "}"
+      ],
+      spiral_2d: [
+        "function spiralTraversal(matrix) {",
+        "  while (top <= bottom && left <= right) {",
+        "    for (c = left; c <= right; c++) visit(matrix[top][c]);",
+        "    for (r = top+1; r <= bottom; r++) visit(matrix[r][right]);",
+        "    // Shrink boundaries & sweep inward",
+        "  }",
+        "}"
+      ],
+      update_3d: [
+        "function updateTensor3D(tensor, d, r, c, val) {",
+        "  // Locate Layer [d], Row [r], Column [c]",
+        "  tensor[d][r][c] = val;",
+        "  return tensor;",
+        "}"
+      ],
+      search_3d: [
+        "function searchTensor3D(tensor, target) {",
+        "  for (let d = 0; d < depth; d++)",
+        "    for (let r = 0; r < rows; r++)",
+        "      for (let c = 0; c < cols; c++)",
+        "        if (tensor[d][r][c] === target) return [d, r, c];",
+        "  return null;",
+        "}"
+      ],
+      traverse_3d: [
+        "function traverseTensor3D(tensor) {",
+        "  for (let d = 0; d < depth; d++) {",
+        "    for (let r = 0; r < rows; r++) {",
+        "      for (let c = 0; c < cols; c++) visit(tensor[d][r][c]);",
+        "    }",
+        "  }",
+        "}"
+      ],
+      push: [
+        "function push(stack, value) {",
+        "  top = top + 1;",
+        "  stack[top] = value; // LIFO insertion at TOP",
+        "  return stack;",
+        "}"
+      ],
+      pop: [
+        "function pop(stack) {",
+        "  if (isEmpty(stack)) return UNDERFLOW;",
+        "  const removed = stack[top];",
+        "  top = top - 1;      // Decrement TOP pointer",
+        "  return removed;",
+        "}"
+      ],
+      peek: [
+        "function peek(stack) {",
+        "  if (isEmpty(stack)) return null;",
+        "  return stack[top]; // Inspect TOP without removing",
+        "}"
+      ],
+      search_stack: [
+        "function searchFromTop(stack, target) {",
+        "  for (let idx = top; idx >= 0; idx--) {",
+        "    if (stack[idx] === target) return top - idx;",
+        "  }",
+        "  return -1;",
+        "}"
+      ],
+      enqueue: [
+        "function enqueue(queue, value) {",
+        "  rear = rear + 1;",
+        "  queue[rear] = value; // Insert at REAR",
+        "  return queue;",
+        "}"
+      ],
+      dequeue: [
+        "function dequeue(queue) {",
+        "  if (isEmpty(queue)) return UNDERFLOW;",
+        "  const val = queue[front];",
+        "  front = front + 1;   // Advance FRONT",
+        "  return val;",
+        "}"
+      ],
+      peek_queue: [
+        "function peekFront(queue) {",
+        "  if (isEmpty(queue)) return null;",
+        "  return queue[front];",
+        "}"
+      ],
+      search_queue: [
+        "function searchQueue(queue, target) {",
+        "  for (let i = 0; i < queue.length; i++) {",
+        "    if (queue[i] === target) return i;",
+        "  }",
+        "  return -1;",
+        "}"
+      ],
+      enqueue_circ: [
+        "function circularEnqueue(ring, value) {",
+        "  if (size === capacity) return OVERFLOW;",
+        "  rear = (rear + 1) % capacity; // Modulo wrap-around",
+        "  ring[rear] = value; size++;",
+        "}"
+      ],
+      dequeue_circ: [
+        "function circularDequeue(ring) {",
+        "  if (size === 0) return UNDERFLOW;",
+        "  const val = ring[front]; ring[front] = null;",
+        "  front = (front + 1) % capacity; size--;",
+        "  return val;",
+        "}"
+      ],
+      peek_circ: [
+        "function peekCircular(ring) {",
+        "  if (size === 0) return null;",
+        "  return ring[front];",
+        "}"
+      ],
+      search_circ: [
+        "function searchCircular(ring, target) {",
+        "  for (let step = 0; step < size; step++) {",
+        "    let idx = (front + step) % capacity;",
+        "    if (ring[idx] === target) return idx;",
+        "  }",
+        "  return -1;",
+        "}"
+      ],
+      insert_front: [
+        "function insertFront(deque, value) {",
+        "  deque.unshift(value); // Open-ended left entry",
+        "  return deque;",
+        "}"
+      ],
+      insert_rear: [
+        "function insertRear(deque, value) {",
+        "  deque.push(value);    // Open-ended right entry",
+        "  return deque;",
+        "}"
+      ],
+      delete_front: [
+        "function deleteFront(deque) {",
+        "  if (deque.length === 0) return null;",
+        "  return deque.shift(); // Remove from left end",
+        "}"
+      ],
+      delete_rear: [
+        "function deleteRear(deque) {",
+        "  if (deque.length === 0) return null;",
+        "  return deque.pop();   // Remove from right end",
+        "}"
+      ],
+      enqueue_pq: [
+        "function enqueuePriority(pq, value) {",
+        "  pq.push(value);",
+        "  // Bubble element into ascending priority order",
+        "  pq.sort((a, b) => a - b);",
+        "  return pq;",
+        "}"
+      ],
+      insert_head: [
+        "function insertAtHead(head, value) {",
+        "  const newNode = new Node(value);",
+        "  newNode.next = head;",
+        "  head = newNode; // Update HEAD pointer",
+        "  return head;",
+        "}"
+      ],
+      insert_tail: [
+        "function insertAtTail(head, value) {",
+        "  const newNode = new Node(value);",
+        "  let curr = head;",
+        "  while (curr.next !== null) curr = curr.next;",
+        "  curr.next = newNode;",
+        "}"
+      ],
+      insert_at: [
+        "function insertAtIndex(head, index, value) {",
+        "  let curr = head, pos = 0;",
+        "  while (pos < index - 1) { curr = curr.next; pos++; }",
+        "  const newNode = new Node(value);",
+        "  newNode.next = curr.next; curr.next = newNode;",
+        "}"
+      ],
+      delete_val: [
+        "function deleteByValue(head, target) {",
+        "  let curr = head;",
+        "  while (curr && curr.data !== target) curr = curr.next;",
+        "  if (curr) unlinkNode(curr); // Bypass target node",
+        "}"
+      ],
+      delete_at: [
+        "function deleteAtIndex(head, index) {",
+        "  let curr = head, pos = 0;",
+        "  while (pos < index) { curr = curr.next; pos++; }",
+        "  unlinkNode(curr);",
+        "}"
+      ],
+      search_ll: [
+        "function searchList(head, target) {",
+        "  let curr = head, index = 0;",
+        "  while (curr !== null) {",
+        "    if (curr.data === target) return index;",
+        "    curr = curr.next; index++;",
+        "  }",
+        "  return -1;",
+        "}"
+      ],
+      traverse_ll: [
+        "function traverseList(head) {",
+        "  let curr = head;",
+        "  while (curr !== null) {",
+        "    visit(curr.data);",
+        "    curr = curr.next;",
+        "  }",
+        "}"
+      ],
+      insert_tree: [
+        "function insertNode(root, val) {",
+        "  if (!root) return new TreeNode(val);",
+        "  if (val < root.val) root.left = insertNode(root.left, val);",
+        "  else root.right = insertNode(root.right, val);",
+        "  return root;",
+        "}"
+      ],
+      delete_tree: [
+        "function deleteNode(root, val) {",
+        "  if (!root) return null;",
+        "  if (val === root.val) return removeAndRebalance(root);",
+        "  if (val < root.val) root.left = deleteNode(root.left, val);",
+        "  else root.right = deleteNode(root.right, val);",
+        "  return root;",
+        "}"
+      ],
+      search_tree: [
+        "function searchTree(node, target) {",
+        "  if (!node) return null;",
+        "  if (node.val === target) return node;",
+        "  if (target < node.val) return searchTree(node.left, target);",
+        "  return searchTree(node.right, target);",
+        "}"
+      ],
+      inorder: [
+        "function inOrderDFS(node) {",
+        "  if (!node) return;",
+        "  inOrderDFS(node.left);  // 1. Left Subtree",
+        "  visit(node.val);        // 2. Process Root",
+        "  inOrderDFS(node.right); // 3. Right Subtree",
+        "}"
+      ],
+      preorder: [
+        "function preOrderDFS(node) {",
+        "  if (!node) return;",
+        "  visit(node.val);         // 1. Process Root",
+        "  preOrderDFS(node.left);  // 2. Left Subtree",
+        "  preOrderDFS(node.right); // 3. Right Subtree",
+        "}"
+      ],
+      postorder: [
+        "function postOrderDFS(node) {",
+        "  if (!node) return;",
+        "  postOrderDFS(node.left);  // 1. Left Subtree",
+        "  postOrderDFS(node.right); // 2. Right Subtree",
+        "  visit(node.val);          // 3. Process Root",
+        "}"
+      ],
+      levelorder: [
+        "function levelOrderBFS(root) {",
+        "  const queue = [root];",
+        "  while (queue.length > 0) {",
+        "    const node = queue.shift();",
+        "    visit(node.val);",
+        "    if (node.left) queue.push(node.left);",
+        "    if (node.right) queue.push(node.right);",
+        "  }",
+        "}"
+      ]
+    };
+
+    /***************************************************************************
+     * 4. UI REFERENCES & GLOBAL PLAYBACK STATE
+     ***************************************************************************/
+    const dsSelect = document.getElementById("dsSelect");
+    const subtypeSelect = document.getElementById("subtypeSelect");
+    const opSelect = document.getElementById("opSelect");
+
+    const datasetInput = document.getElementById("datasetInput");
+    const loadDataBtn = document.getElementById("loadDataBtn");
+    const randomDataBtn = document.getElementById("randomDataBtn");
+
+    const paramValWrap = document.getElementById("paramValWrap");
+    const paramValLabel = document.getElementById("paramValLabel");
+    const paramValInput = document.getElementById("paramValInput");
+
+    const paramIdxWrap = document.getElementById("paramIdxWrap");
+    const paramIdxLabel = document.getElementById("paramIdxLabel");
+    const paramIdxInput = document.getElementById("paramIdxInput");
+
+    const paramDepthWrap = document.getElementById("paramDepthWrap");
+    const paramDepthInput = document.getElementById("paramDepthInput");
+    const paramRowWrap = document.getElementById("paramRowWrap");
+    const paramRowInput = document.getElementById("paramRowInput");
+    const paramColWrap = document.getElementById("paramColWrap");
+    const paramColInput = document.getElementById("paramColInput");
+
+    const executeBtn = document.getElementById("executeBtn");
+    const feedbackToast = document.getElementById("feedbackToast");
+    const complexityBadge = document.getElementById("complexityBadge");
+
+    const stepBadge = document.getElementById("stepBadge");
+    const stepExplanation = document.getElementById("stepExplanation");
+    const canvasTitleBadge = document.getElementById("canvasTitleBadge");
+    const canvasMetaInfo = document.getElementById("canvasMetaInfo");
+    const visualStage = document.getElementById("visualStage");
+    const outputTray = document.getElementById("outputTray");
+    const codeBox = document.getElementById("codeBox");
+    const opNameTag = document.getElementById("opNameTag");
+    const varsGrid = document.getElementById("varsGrid");
+
+    const firstBtn = document.getElementById("firstBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const playBtn = document.getElementById("playBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const lastBtn = document.getElementById("lastBtn");
+    const speedSlider = document.getElementById("speedSlider");
+
+    let currentDS = "array";
+    let currentSubtype = "1d";
+    let currentOp = "insert_idx";
+    let frames = [];
+    let currentFrameIdx = 0;
+    let playTimer = null;
+
+    function showToast(msg) {
+      feedbackToast.textContent = msg;
+      feedbackToast.classList.remove("hidden");
+      setTimeout(() => feedbackToast.classList.add("hidden"), 2800);
+    }
+
+    /***************************************************************************
+     * 5. CASCADING MENU POPULATION & PARAMETER VISIBILITY
+     ***************************************************************************/
+    function updateSubtypeMenu() {
+      currentDS = dsSelect.value;
+      const subtypes = MENU_CONFIG[currentDS].subtypes;
+      subtypeSelect.innerHTML = Object.entries(subtypes)
+        .map(([k, v]) => `<option value="${k}">${v.label}</option>`)
+        .join("");
+      currentSubtype = subtypeSelect.value;
+      syncDatasetInputBox();
+      updateOperationMenu();
+    }
+
+    function updateOperationMenu() {
+      currentSubtype = subtypeSelect.value;
+      const ops = MENU_CONFIG[currentDS].subtypes[currentSubtype].operations;
+      opSelect.innerHTML = ops
+        .map(o => `<option value="${o.id}">${o.name}</option>`)
+        .join("");
+      currentOp = opSelect.value;
+      syncDatasetInputBox();
+      updateParameterInputs();
+      renderInitialIdleFrame();
+    }
+
+    function updateParameterInputs() {
+      currentOp = opSelect.value;
+      const ops = MENU_CONFIG[currentDS].subtypes[currentSubtype].operations;
+      const opObj = ops.find(o => o.id === currentOp) || ops[0];
+
+      complexityBadge.textContent = `Time: ${opObj.time} | Space: ${opObj.space}`;
+      opNameTag.textContent = `${currentOp}()`;
+
+      const params = opObj.params || [];
+      paramValWrap.classList.toggle("hidden", !params.includes("val"));
+      paramIdxWrap.classList.toggle("hidden", !params.includes("idx"));
+      paramDepthWrap.classList.toggle("hidden", !params.includes("depth"));
+      paramRowWrap.classList.toggle("hidden", !params.includes("row"));
+      paramColWrap.classList.toggle("hidden", !params.includes("col"));
+
+      if (currentOp.includes("search")) {
+        paramValLabel.textContent = "Target to Find";
+      } else if (currentOp.includes("delete_val") || currentOp.includes("delete_tree")) {
+        paramValLabel.textContent = "Value to Delete";
+      } else {
+        paramValLabel.textContent = "Element Value";
+      }
+
+      paramIdxLabel.textContent = opObj.idxLabel || "Index [i]";
+      renderCodePanel(CODE_SNIPPETS[currentOp] || ["// Algorithm Execution"]);
+    }
+
+    function syncDatasetInputBox() {
+      const data = STATE_STORE[currentSubtype];
+      if (Array.isArray(data)) {
+        datasetInput.value = data.flat(2).join(", ");
+      } else if (data && data.buffer) {
+        datasetInput.value = data.buffer.filter(x => x !== null).join(", ");
+      }
+    }
+
+    /***************************************************************************
+     * 6. FRAME GENERATOR ENGINE (ALL SUBTYPES & OPERATIONS)
+     ***************************************************************************/
+    function renderInitialIdleFrame() {
+      stopPlayback();
+      const snapshot = cloneState(STATE_STORE[currentSubtype]);
+      frames = [{
+        subtype: currentSubtype,
+        data: snapshot,
+        active: [],
+        mutate: [],
+        found: [],
+        visited: [],
+        pointers: {},
+        line: 0,
+        vars: { status: "Ready", subtype: currentSubtype },
+        output: "—",
+        desc: `Viewing live persistent ${MENU_CONFIG[currentDS].subtypes[currentSubtype].label}. Choose parameters and click "Execute & Store".`
+      }];
+      currentFrameIdx = 0;
+      renderFrame();
+    }
+
+    function cloneState(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function executeOperation() {
+      stopPlayback();
+      const val = Number(paramValInput.value) || 0;
+      const idxRaw = Number(paramIdxInput.value) || 0;
+      const depth = Number(paramDepthInput.value) || 0;
+      const row = Number(paramRowInput.value) || 0;
+      const col = Number(paramColInput.value) || 0;
+
+      frames = [];
+
+      // Dispatch by subtype
+      if (currentSubtype === "1d") {
+        run1DArrayOperation(currentOp, val, idxRaw);
+      } else if (currentSubtype === "2d") {
+        run2DArrayOperation(currentOp, val, row, col);
+      } else if (currentSubtype === "3d") {
+        run3DArrayOperation(currentOp, val, depth, row, col);
+      } else if (currentSubtype === "array_stack" || currentSubtype === "linked_stack") {
+        runStackOperation(currentOp, val);
+      } else if (["simple_queue", "deque", "priority_queue"].includes(currentSubtype)) {
+        runLinearQueueOperation(currentOp, val);
+      } else if (currentSubtype === "circular_queue") {
+        runCircularQueueOperation(currentOp, val);
+      } else if (["singly", "doubly", "circular"].includes(currentSubtype)) {
+        runLinkedListOperation(currentOp, val, idxRaw);
+      } else if (["bst", "complete_tree"].includes(currentSubtype)) {
+        runTreeOperation(currentOp, val);
+      }
+
+      syncDatasetInputBox();
+      currentFrameIdx = 0;
+      renderFrame();
+      startPlayback();
+    }
+
+    // ------------------- 1D ARRAY OPERATIONS -------------------
+    function run1DArrayOperation(op, val, idxInput) {
+      let arr = [...STATE_STORE["1d"]];
+      const pushFrame = (opts) => frames.push({
+        subtype: "1d",
+        data: [...arr],
+        active: opts.active || [],
+        mutate: opts.mutate || [],
+        found: opts.found || [],
+        visited: opts.visited || [],
+        pointers: opts.pointers || {},
+        line: opts.line || 0,
+        vars: opts.vars || {},
+        output: opts.output || "—",
+        desc: opts.desc || ""
+      });
+
+      if (op === "insert_idx") {
+        const idx = Math.max(0, Math.min(arr.length, idxInput));
+        pushFrame({ line: 0, vars: { index: idx, value: val }, desc: `Preparing to insert ${val} at index [${idx}].` });
+        arr.push(arr[arr.length - 1] ?? val);
+        for (let i = arr.length - 1; i > idx; i--) {
+          arr[i] = arr[i - 1];
+          pushFrame({
+            active: [i - 1], mutate: [i], pointers: { [i]: "shift→" }, line: 2,
+            vars: { i, "arr[i]": arr[i] }, desc: `Shifting element ${arr[i]} right from [${i - 1}] to [${i}].`
+          });
+        }
+        arr[idx] = val;
+        STATE_STORE["1d"] = [...arr];
+        pushFrame({
+          found: [idx], pointers: { [idx]: "INSERTED" }, line: 4,
+          vars: { index: idx, inserted: val, newLength: arr.length },
+          output: `Inserted ${val} at [${idx}]`,
+          desc: `Stored ${val} at index [${idx}]. Array updated and persisted!`
+        });
+      }
+
+      else if (op === "delete_idx") {
+        if (arr.length === 0) return;
+        const idx = Math.max(0, Math.min(arr.length - 1, idxInput));
+        const removed = arr[idx];
+        pushFrame({ mutate: [idx], pointers: { [idx]: "DELETE" }, line: 1, vars: { index: idx, removed }, desc: `Targeting element ${removed} at index [${idx}] for deletion.` });
+        for (let i = idx; i < arr.length - 1; i++) {
+          arr[i] = arr[i + 1];
+          pushFrame({
+            active: [i + 1], mutate: [i], pointers: { [i]: "←shift" }, line: 3,
+            vars: { i, shifted: arr[i] }, desc: `Shifting ${arr[i]} left into index [${i}].`
+          });
+        }
+        arr.pop();
+        STATE_STORE["1d"] = [...arr];
+        pushFrame({
+          line: 5, vars: { deleted: removed, newLength: arr.length },
+          output: `Deleted ${removed} from [${idx}]`,
+          desc: `Deleted ${removed} and resized array to ${arr.length} elements.`
+        });
+      }
+
+      else if (op === "update_idx") {
+        if (arr.length === 0) return;
+        const idx = Math.max(0, Math.min(arr.length - 1, idxInput));
+        const old = arr[idx];
+        pushFrame({ active: [idx], pointers: { [idx]: "TARGET" }, line: 2, vars: { index: idx, oldVal: old, newVal: val }, desc: `Accessing index [${idx}] (current value: ${old}).` });
+        arr[idx] = val;
+        STATE_STORE["1d"] = [...arr];
+        pushFrame({ found: [idx], pointers: { [idx]: "UPDATED" }, line: 3, vars: { index: idx, oldVal: old, newVal: val }, output: `arr[${idx}] = ${val}`, desc: `Updated arr[${idx}] from ${old} to ${val} in O(1) time.` });
+      }
+
+      else if (op === "linear_search") {
+        pushFrame({ line: 0, vars: { target: val }, desc: `Starting Linear Search for target = ${val}.` });
+        let foundIdx = -1;
+        for (let i = 0; i < arr.length; i++) {
+          pushFrame({
+            active: [i], visited: Array.from({ length: i }, (_, k) => k),
+            pointers: { [i]: "i" }, line: 2,
+            vars: { target: val, i, "arr[i]": arr[i] },
+            desc: `Comparing arr[${i}] (${arr[i]}) with target ${val}...`
+          });
+          if (arr[i] === val) {
+            foundIdx = i;
+            pushFrame({
+              found: [i], pointers: { [i]: "FOUND!" }, line: 3,
+              vars: { target: val, foundAt: i },
+              output: `Found ${val} at index [${i}]`,
+              desc: `Match found! Element ${val} is located at index [${i}].`
+            });
+            break;
+          }
+        }
+        if (foundIdx === -1) {
+          pushFrame({
+            visited: arr.map((_, i) => i), line: 6,
+            vars: { target: val, result: -1 },
+            output: `${val} Not Found (-1)`,
+            desc: `Reached end of array. Target ${val} was not found.`
+          });
+        }
+      }
+
+      else if (op === "binary_search") {
+        arr.sort((a, b) => a - b);
+        STATE_STORE["1d"] = [...arr];
+        let low = 0, high = arr.length - 1, foundIdx = -1;
+        pushFrame({
+          pointers: { [low]: "L", [high]: "H" }, line: 1,
+          vars: { target: val, low, high },
+          desc: `Array sorted for Binary Search. Searching for target ${val} within [${low}..${high}].`
+        });
+        while (low <= high) {
+          const mid = Math.floor((low + high) / 2);
+          pushFrame({
+            active: [mid], pointers: { [low]: "L", [mid]: "MID", [high]: "H" }, line: 3,
+            vars: { target: val, low, mid, high, "arr[mid]": arr[mid] },
+            desc: `Checking middle index [${mid}] with value ${arr[mid]}.`
+          });
+          if (arr[mid] === val) {
+            foundIdx = mid;
+            pushFrame({
+              found: [mid], pointers: { [mid]: "FOUND!" }, line: 4,
+              vars: { target: val, foundAt: mid },
+              output: `Found ${val} at index [${mid}]`,
+              desc: `Target ${val} found at index [${mid}]!`
+            });
+            break;
+          } else if (arr[mid] < val) {
+            low = mid + 1;
+            pushFrame({
+              pointers: { [low]: "L", [high]: "H" }, line: 5,
+              vars: { target: val, low, high },
+              desc: `${arr[mid]} < ${val}: Discard left half, move low to ${low}.`
+            });
+          } else {
+            high = mid - 1;
+            pushFrame({
+              pointers: { [low]: "L", [high]: "H" }, line: 6,
+              vars: { target: val, low, high },
+              desc: `${arr[mid]} > ${val}: Discard right half, move high to ${high}.`
+            });
+          }
+        }
+        if (foundIdx === -1) {
+          pushFrame({ line: 8, vars: { target: val, result: -1 }, output: `${val} Not Found (-1)`, desc: `Search space exhausted. Target ${val} not in array.` });
+        }
+      }
+
+      else if (op === "bubble_sort") {
+        const sortedSet = new Set();
+        for (let i = 0; i < arr.length - 1; i++) {
+          for (let j = 0; j < arr.length - i - 1; j++) {
+            pushFrame({
+              active: [j, j + 1], found: [...sortedSet], pointers: { [j]: "j", [j + 1]: "j+1" }, line: 3,
+              vars: { i, j, "arr[j]": arr[j], "arr[j+1]": arr[j + 1] },
+              desc: `Comparing adjacent elements ${arr[j]} and ${arr[j + 1]}.`
+            });
+            if (arr[j] > arr[j + 1]) {
+              [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+              pushFrame({
+                mutate: [j, j + 1], found: [...sortedSet], pointers: { [j]: "swap", [j + 1]: "swap" }, line: 4,
+                vars: { i, j, swapped: `${arr[j]} ↔ ${arr[j + 1]}` },
+                desc: `Swapped ${arr[j + 1]} and ${arr[j]}.`
+              });
+            }
+          }
+          sortedSet.add(arr.length - 1 - i);
+        }
+        sortedSet.add(0);
+        STATE_STORE["1d"] = [...arr];
+        pushFrame({ found: [...sortedSet], line: 7, vars: { status: "Sorted" }, output: arr.join(" ≤ "), desc: `Bubble Sort complete! Sorted array persisted.` });
+      }
+
+      else if (op === "selection_sort") {
+        const sorted = [];
+        for (let i = 0; i < arr.length - 1; i++) {
+          let minIdx = i;
+          for (let j = i + 1; j < arr.length; j++) {
+            pushFrame({
+              active: [minIdx, j], found: [...sorted], pointers: { [i]: "i", [minIdx]: "min", [j]: "j" }, line: 4,
+              vars: { i, minVal: arr[minIdx], "arr[j]": arr[j] },
+              desc: `Scanning for minimum: comparing current min ${arr[minIdx]} with ${arr[j]}.`
+            });
+            if (arr[j] < arr[minIdx]) minIdx = j;
+          }
+          [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+          sorted.push(i);
+          pushFrame({
+            mutate: [i, minIdx], found: [...sorted], pointers: { [i]: "placed" }, line: 6,
+            vars: { i, placedMin: arr[i] },
+            desc: `Swapped minimum value ${arr[i]} into index [${i}].`
+          });
+        }
+        sorted.push(arr.length - 1);
+        STATE_STORE["1d"] = [...arr];
+        pushFrame({ found: sorted, line: 7, vars: { status: "Sorted" }, output: arr.join(" ≤ "), desc: `Selection Sort complete!` });
+      }
+
+      else if (op === "insertion_sort") {
+        for (let i = 1; i < arr.length; i++) {
+          let key = arr[i], j = i - 1;
+          pushFrame({
+            active: [i], pointers: { [i]: `key=${key}` }, line: 2,
+            vars: { i, key }, desc: `Picked key = ${key} at index [${i}] to insert into sorted left prefix.`
+          });
+          while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            pushFrame({
+              mutate: [j, j + 1], pointers: { [j]: "shift→" }, line: 4,
+              vars: { key, j, shifted: arr[j] }, desc: `Shifted ${arr[j]} right because ${arr[j]} > ${key}.`
+            });
+            j--;
+          }
+          arr[j + 1] = key;
+          pushFrame({
+            found: Array.from({ length: i + 1 }, (_, k) => k), pointers: { [j + 1]: "inserted" }, line: 6,
+            vars: { key, insertedAt: j + 1 }, desc: `Inserted key ${key} at index [${j + 1}].`
+          });
+        }
+        STATE_STORE["1d"] = [...arr];
+        pushFrame({ found: arr.map((_, i) => i), line: 7, vars: { status: "Sorted" }, output: arr.join(" ≤ "), desc: `Insertion Sort complete!` });
+      }
+
+      else if (op === "quick_sort") {
+        const sortedIndices = new Set();
+        function qSort(low, high) {
+          if (low >= high) {
+            if (low === high) sortedIndices.add(low);
+            return;
+          }
+          let pivot = arr[high], i = low;
+          pushFrame({
+            active: [high], found: [...sortedIndices], pointers: { [high]: `pivot=${pivot}`, [low]: "low" }, line: 2,
+            vars: { low, high, pivot }, desc: `Partitioning subarray [${low}..${high}] around pivot ${pivot}.`
+          });
+          for (let j = low; j < high; j++) {
+            pushFrame({
+              active: [j, high], found: [...sortedIndices], pointers: { [i]: "i", [j]: "j", [high]: "pivot" }, line: 4,
+              vars: { pivot, i, j, "arr[j]": arr[j] }, desc: `Comparing arr[${j}] (${arr[j]}) with pivot ${pivot}.`
+            });
+            if (arr[j] < pivot) {
+              [arr[i], arr[j]] = [arr[j], arr[i]];
+              i++;
+            }
+          }
+          [arr[i], arr[high]] = [arr[high], arr[i]];
+          sortedIndices.add(i);
+          pushFrame({
+            mutate: [i], found: [...sortedIndices], pointers: { [i]: "pivotLock" }, line: 6,
+            vars: { pivotPlacedAt: i }, desc: `Pivot ${pivot} locked into its final sorted index [${i}].`
+          });
+          qSort(low, i - 1);
+          qSort(i + 1, high);
+        }
+        qSort(0, arr.length - 1);
+        STATE_STORE["1d"] = [...arr];
+        pushFrame({ found: arr.map((_, i) => i), line: 7, vars: { status: "Sorted" }, output: arr.join(" ≤ "), desc: `Quick Sort complete!` });
+      }
+
+      else if (op === "rotate_left" || op === "rotate_right") {
+        const k = Math.max(1, idxInput % Math.max(1, arr.length));
+        pushFrame({ line: 1, vars: { k, direction: op === "rotate_left" ? "Left" : "Right" }, desc: `Rotating array ${op === "rotate_left" ? "LEFT" : "RIGHT"} by k = ${k} steps.` });
+        for (let s = 1; s <= k; s++) {
+          if (op === "rotate_left") {
+            const first = arr.shift();
+            arr.push(first);
+            pushFrame({
+              mutate: [arr.length - 1], active: [0], pointers: { [arr.length - 1]: "wrapped" }, line: 4,
+              vars: { step: `${s}/${k}`, movedVal: first },
+              desc: `Step ${s}: Shifted front element ${first} around to tail.`
+            });
+          } else {
+            const last = arr.pop();
+            arr.unshift(last);
+            pushFrame({
+              mutate: [0], active: [arr.length - 1], pointers: { 0: "wrapped" }, line: 4,
+              vars: { step: `${s}/${k}`, movedVal: last },
+              desc: `Step ${s}: Wrapped tail element ${last} around to front.`
+            });
+          }
+        }
+        STATE_STORE["1d"] = [...arr];
+        pushFrame({ found: arr.map((_, i) => i), line: 5, vars: { rotatedBy: k }, output: `[${arr.join(", ")}]`, desc: `Rotation by ${k} steps complete and persisted!` });
+      }
+    }
+
+    // ------------------- 2D MATRIX OPERATIONS -------------------
+    function run2DArrayOperation(op, val, rowIn, colIn) {
+      let mat = cloneState(STATE_STORE["2d"]);
+      const R = mat.length, C = mat[0].length;
+      const r = Math.max(0, Math.min(R - 1, rowIn));
+      const c = Math.max(0, Math.min(C - 1, colIn));
+
+      const pushFrame = (opts) => frames.push({
+        subtype: "2d",
+        data: cloneState(mat),
+        active: opts.active || [],
+        mutate: opts.mutate || [],
+        found: opts.found || [],
+        visited: opts.visited || [],
+        line: opts.line || 0,
+        vars: opts.vars || {},
+        output: opts.output || "—",
+        desc: opts.desc || ""
+      });
+
+      if (op === "update_2d") {
+        const old = mat[r][c];
+        pushFrame({ active: [`${r},${c}`], line: 2, vars: { row: r, col: c, oldVal: old, newVal: val }, desc: `Locating cell [${r}][${c}] (current value: ${old}).` });
+        mat[r][c] = val;
+        STATE_STORE["2d"] = cloneState(mat);
+        pushFrame({ found: [`${r},${c}`], line: 3, vars: { row: r, col: c, updatedTo: val }, output: `matrix[${r}][${c}] = ${val}`, desc: `Updated cell [${r}][${c}] to ${val} and stored in matrix.` });
+      }
+
+      else if (op === "search_2d") {
+        const visited = [];
+        let foundCoord = null;
+        for (let i = 0; i < R; i++) {
+          for (let j = 0; j < C; j++) {
+            const key = `${i},${j}`;
+            pushFrame({
+              active: [key], visited: [...visited], line: 3,
+              vars: { target: val, row: i, col: j, "cell": mat[i][j] },
+              desc: `Checking cell [${i}][${j}] = ${mat[i][j]} against target ${val}.`
+            });
+            if (mat[i][j] === val) {
+              foundCoord = key;
+              pushFrame({
+                found: [key], visited: [...visited], line: 3,
+                vars: { target: val, foundAt: `[${i}][${j}]` },
+                output: `Found ${val} at [${i}][${j}]`,
+                desc: `Target ${val} found at Row ${i}, Column ${j}!`
+              });
+              break;
+            }
+            visited.push(key);
+          }
+          if (foundCoord) break;
+        }
+        if (!foundCoord) {
+          pushFrame({ visited, line: 6, vars: { target: val, result: "Not Found" }, output: `${val} not in matrix`, desc: `Scanned entire ${R}×${C} matrix. Target ${val} not found.` });
+        }
+      }
+
+      else if (op === "row_major" || op === "col_major" || op === "spiral_2d") {
+        const order = [];
+        if (op === "row_major") {
+          for (let i = 0; i < R; i++) for (let j = 0; j < C; j++) order.push([i, j]);
+        } else if (op === "col_major") {
+          for (let j = 0; j < C; j++) for (let i = 0; i < R; i++) order.push([i, j]);
+        } else {
+          let top = 0, bottom = R - 1, left = 0, right = C - 1;
+          while (top <= bottom && left <= right) {
+            for (let j = left; j <= right; j++) order.push([top, j]);
+            top++;
+            for (let i = top; i <= bottom; i++) order.push([i, right]);
+            right--;
+            if (top <= bottom) {
+              for (let j = right; j >= left; j--) order.push([bottom, j]);
+              bottom--;
+            }
+            if (left <= right) {
+              for (let i = bottom; i >= top; i--) order.push([i, left]);
+              left++;
+            }
+          }
+        }
+        const visited = [];
+        const vals = [];
+        order.forEach(([i, j], stepIdx) => {
+          const key = `${i},${j}`;
+          vals.push(mat[i][j]);
+          pushFrame({
+            active: [key], visited: [...visited], line: 3,
+            vars: { step: stepIdx + 1, coord: `[${i}][${j}]`, value: mat[i][j] },
+            output: vals.join(" → "),
+            desc: `Visiting [${i}][${j}] = ${mat[i][j]} (Step ${stepIdx + 1} of ${order.length}).`
+          });
+          visited.push(key);
+        });
+      }
+    }
+
+    // ------------------- 3D TENSOR OPERATIONS -------------------
+    function run3DArrayOperation(op, val, dIn, rIn, cIn) {
+      let tensor = cloneState(STATE_STORE["3d"]);
+      const D = tensor.length, R = tensor[0].length, C = tensor[0][0].length;
+      const d = Math.max(0, Math.min(D - 1, dIn));
+      const r = Math.max(0, Math.min(R - 1, rIn));
+      const c = Math.max(0, Math.min(C - 1, cIn));
+
+      const pushFrame = (opts) => frames.push({
+        subtype: "3d",
+        data: cloneState(tensor),
+        active: opts.active || [],
+        found: opts.found || [],
+        visited: opts.visited || [],
+        line: opts.line || 0,
+        vars: opts.vars || {},
+        output: opts.output || "—",
+        desc: opts.desc || ""
+      });
+
+      if (op === "update_3d") {
+        const key = `${d},${r},${c}`;
+        const prev = tensor[d][r][c];
+        pushFrame({ active: [key], line: 1, vars: { depth: d, row: r, col: c, oldVal: prev }, desc: `Addressing 3D coordinate Layer [${d}], Row [${r}], Col [${c}].` });
+        tensor[d][r][c] = val;
+        STATE_STORE["3d"] = cloneState(tensor);
+        pushFrame({ found: [key], line: 2, vars: { coord: `[${d}][${r}][${c}]`, newVal: val }, output: `tensor[${d}][${r}][${c}] = ${val}`, desc: `Updated 3D cell [${d}][${r}][${c}] from ${prev} to ${val}.` });
+      }
+
+      else if (op === "search_3d" || op === "traverse_3d") {
+        const visited = [];
+        const out = [];
+        let foundKey = null;
+        for (let i = 0; i < D; i++) {
+          for (let j = 0; j < R; j++) {
+            for (let k = 0; k < C; k++) {
+              const key = `${i},${j},${k}`;
+              const cellVal = tensor[i][j][k];
+              out.push(cellVal);
+              pushFrame({
+                active: [key], visited: [...visited], line: 3,
+                vars: { layer: i, row: j, col: k, value: cellVal },
+                output: op === "traverse_3d" ? out.join(" → ") : `Scanning...`,
+                desc: `Layer ${i}, Cell [${j}][${k}] = ${cellVal}.`
+              });
+              if (op === "search_3d" && cellVal === val) {
+                foundKey = key;
+                pushFrame({
+                  found: [key], visited: [...visited], line: 4,
+                  vars: { target: val, foundAt: `[${i}][${j}][${k}]` },
+                  output: `Found ${val} at [${i}][${j}][${k}]`,
+                  desc: `Found target ${val} at Layer ${i}, Row ${j}, Col ${k}!`
+                });
+                break;
+              }
+              visited.push(key);
+            }
+            if (foundKey) break;
+          }
+          if (foundKey) break;
+        }
+        if (op === "search_3d" && !foundKey) {
+          pushFrame({ visited, line: 5, vars: { target: val, found: "false" }, output: `${val} Not Found`, desc: `Target ${val} not present in any 3D layer.` });
+        }
+      }
+    }
+
+    // ------------------- STACK OPERATIONS -------------------
+    function runStackOperation(op, val) {
+      let stk = [...STATE_STORE[currentSubtype]];
+      const pushFrame = (opts) => frames.push({
+        subtype: currentSubtype,
+        data: [...stk],
+        active: opts.active || [],
+        mutate: opts.mutate || [],
+        found: opts.found || [],
+        line: opts.line || 0,
+        vars: opts.vars || {},
+        output: opts.output || "—",
+        desc: opts.desc || ""
+      });
+
+      if (op === "push") {
+        pushFrame({ line: 1, vars: { top: stk.length - 1, newVal: val }, desc: `Preparing to push ${val} onto the TOP of the stack.` });
+        stk.push(val);
+        STATE_STORE[currentSubtype] = [...stk];
+        pushFrame({
+          found: [stk.length - 1], line: 2,
+          vars: { top: stk.length - 1, pushed: val, size: stk.length },
+          output: `Pushed ${val} (New Top)`,
+          desc: `Pushed ${val} onto stack. TOP index is now [${stk.length - 1}].`
+        });
+      } else if (op === "pop") {
+        if (stk.length === 0) {
+          pushFrame({ line: 1, vars: { status: "STACK UNDERFLOW" }, output: "Underflow!", desc: "Cannot pop: Stack is empty (Underflow)." });
+          return;
+        }
+        const topIdx = stk.length - 1;
+        const popped = stk[topIdx];
+        pushFrame({ mutate: [topIdx], line: 2, vars: { top: topIdx, popping: popped }, desc: `Removing top element ${popped} at index [${topIdx}].` });
+        stk.pop();
+        STATE_STORE[currentSubtype] = [...stk];
+        pushFrame({ line: 3, vars: { popped, newTop: stk.length - 1 }, output: `Popped ${popped}`, desc: `Popped ${popped} from stack. New TOP is [${stk.length - 1}].` });
+      } else if (op === "peek") {
+        if (stk.length === 0) {
+          pushFrame({ line: 1, vars: { top: -1 }, output: "Stack Empty", desc: "Stack is empty." });
+          return;
+        }
+        const topIdx = stk.length - 1;
+        pushFrame({ found: [topIdx], line: 2, vars: { top: topIdx, topValue: stk[topIdx] }, output: `Top = ${stk[topIdx]}`, desc: `Peeked at TOP element: ${stk[topIdx]} at index [${topIdx}].` });
+      } else if (op === "search_stack") {
+        let found = false;
+        for (let i = stk.length - 1; i >= 0; i--) {
+          const dist = stk.length - 1 - i;
+          pushFrame({ active: [i], line: 1, vars: { target: val, index: i, distanceFromTop: dist }, desc: `Inspecting stack[${i}] = ${stk[i]} (distance ${dist} from TOP).` });
+          if (stk[i] === val) {
+            found = true;
+            pushFrame({ found: [i], line: 2, vars: { target: val, foundAt: i, distanceFromTop: dist }, output: `Found ${val} at [${i}]`, desc: `Found ${val} at index [${i}] (${dist} steps from TOP)!` });
+            break;
+          }
+        }
+        if (!found) pushFrame({ line: 4, vars: { target: val, result: -1 }, output: `${val} Not Found`, desc: `Element ${val} not found in stack.` });
+      }
+    }
+
+    // ------------------- LINEAR / DEQUE / PRIORITY QUEUE OPERATIONS -------------------
+    function runLinearQueueOperation(op, val) {
+      let q = [...STATE_STORE[currentSubtype]];
+      const pushFrame = (opts) => frames.push({
+        subtype: currentSubtype,
+        data: [...q],
+        active: opts.active || [],
+        mutate: opts.mutate || [],
+        found: opts.found || [],
+        line: opts.line || 0,
+        vars: opts.vars || {},
+        output: opts.output || "—",
+        desc: opts.desc || ""
+      });
+
+      if (op === "enqueue" || op === "insert_rear") {
+        pushFrame({ line: 1, vars: { rear: q.length - 1, incoming: val }, desc: `Inserting ${val} at the REAR of the queue.` });
+        q.push(val);
+        STATE_STORE[currentSubtype] = [...q];
+        pushFrame({ found: [q.length - 1], line: 2, vars: { front: 0, rear: q.length - 1, size: q.length }, output: `Enqueued ${val} at Rear`, desc: `${val} joined at the REAR of the queue.` });
+      }
+      else if (op === "insert_front") {
+        pushFrame({ line: 1, vars: { incoming: val }, desc: `Inserting ${val} directly at the FRONT of the Deque.` });
+        q.unshift(val);
+        STATE_STORE[currentSubtype] = [...q];
+        pushFrame({ found: [0], line: 1, vars: { frontVal: val, size: q.length }, output: `Inserted ${val} at Front`, desc: `${val} inserted at FRONT [0] of Deque.` });
+      }
+      else if (op === "enqueue_pq") {
+        q.push(val);
+        pushFrame({ mutate: [q.length - 1], line: 1, vars: { inserted: val }, desc: `Inserted ${val}; now ordering by Min-Priority...` });
+        q.sort((a, b) => a - b);
+        const placedIdx = q.indexOf(val);
+        STATE_STORE[currentSubtype] = [...q];
+        pushFrame({ found: [placedIdx], line: 3, vars: { val, priorityRank: placedIdx + 1 }, output: `Enqueued ${val} (Rank #${placedIdx + 1})`, desc: `Positioned ${val} at priority index [${placedIdx}] in sorted Min-Priority Queue.` });
+      }
+      else if (op === "dequeue" || op === "delete_front") {
+        if (q.length === 0) {
+          pushFrame({ line: 1, vars: { status: "UNDERFLOW" }, output: "Queue Empty", desc: "Cannot dequeue from an empty queue." });
+          return;
+        }
+        const removed = q[0];
+        pushFrame({ mutate: [0], line: 2, vars: { frontVal: removed }, desc: `Removing FRONT element ${removed} at index [0].` });
+        q.shift();
+        STATE_STORE[currentSubtype] = [...q];
+        pushFrame({ line: 3, vars: { dequeued: removed, remaining: q.length }, output: `Removed Front: ${removed}`, desc: `Removed ${removed} from FRONT. Queue size is now ${q.length}.` });
+      }
+      else if (op === "delete_rear") {
+        if (q.length === 0) {
+          pushFrame({ line: 1, vars: { status: "EMPTY" }, output: "Deque Empty", desc: "Deque is empty." });
+          return;
+        }
+        const removed = q[q.length - 1];
+        pushFrame({ mutate: [q.length - 1], line: 2, vars: { rearVal: removed }, desc: `Removing REAR element ${removed} from right end.` });
+        q.pop();
+        STATE_STORE[currentSubtype] = [...q];
+        pushFrame({ line: 2, vars: { removedRear: removed, remaining: q.length }, output: `Removed Rear: ${removed}`, desc: `Removed ${removed} from REAR of Deque.` });
+      }
+      else if (op === "peek_queue") {
+        if (q.length === 0) {
+          pushFrame({ line: 1, vars: { size: 0 }, output: "Empty", desc: "Queue is empty." });
+          return;
+        }
+        pushFrame({ found: [0], line: 2, vars: { front: q[0], rear: q[q.length - 1] }, output: `Front = ${q[0]}`, desc: `Front element is ${q[0]}.` });
+      }
+      else if (op === "search_queue") {
+        let hit = -1;
+        for (let i = 0; i < q.length; i++) {
+          pushFrame({ active: [i], line: 1, vars: { target: val, index: i, current: q[i] }, desc: `Checking queue[${i}] = ${q[i]}...` });
+          if (q[i] === val) {
+            hit = i;
+            pushFrame({ found: [i], line: 2, vars: { target: val, foundAt: i }, output: `Found ${val} at [${i}]`, desc: `Found ${val} at position [${i}] from front!` });
+            break;
+          }
+        }
+        if (hit === -1) pushFrame({ line: 4, vars: { target: val, found: "false" }, output: `${val} Not Found`, desc: `Element ${val} not in queue.` });
+      }
+    }
+
+    // ------------------- CIRCULAR QUEUE (RING BUFFER) OPERATIONS -------------------
+    function runCircularQueueOperation(op, val) {
+      let cq = cloneState(STATE_STORE["circular_queue"]);
+      const pushFrame = (opts) => frames.push({
+        subtype: "circular_queue",
+        data: cloneState(cq),
+        active: opts.active || [],
+        mutate: opts.mutate || [],
+        found: opts.found || [],
+        line: opts.line || 0,
+        vars: { front: cq.front, rear: cq.rear, size: `${cq.size}/${cq.capacity}`, ...(opts.vars || {}) },
+        output: opts.output || "—",
+        desc: opts.desc || ""
+      });
+
+      if (op === "enqueue_circ") {
+        if (cq.size === cq.capacity) {
+          pushFrame({ line: 1, vars: { status: "RING FULL" }, output: "Overflow (Full)", desc: "Circular Queue is at full capacity (8/8)!" });
+          return;
+        }
+        const nextRear = cq.size === 0 ? cq.front : (cq.rear + 1) % cq.capacity;
+        pushFrame({ active: [nextRear], line: 2, vars: { nextRear, formula: `(${cq.rear}+1)%${cq.capacity}` }, desc: `Computing modulo wrap-around: rear = (${cq.rear} + 1) % ${cq.capacity} = ${nextRear}.` });
+        cq.rear = nextRear;
+        cq.buffer[cq.rear] = val;
+        cq.size++;
+        STATE_STORE["circular_queue"] = cloneState(cq);
+        pushFrame({ found: [cq.rear], line: 3, vars: { inserted: val }, output: `Enqueued ${val} at slot [${cq.rear}]`, desc: `Stored ${val} in ring slot [${cq.rear}].` });
+      }
+      else if (op === "dequeue_circ") {
+        if (cq.size === 0) {
+          pushFrame({ line: 1, vars: { status: "RING EMPTY" }, output: "Underflow", desc: "Circular Queue is empty!" });
+          return;
+        }
+        const oldFront = cq.front;
+        const removed = cq.buffer[oldFront];
+        pushFrame({ mutate: [oldFront], line: 2, vars: { removing: removed, slot: oldFront }, desc: `Extracting ${removed} from FRONT slot [${oldFront}].` });
+        cq.buffer[oldFront] = null;
+        cq.size--;
+        if (cq.size > 0) cq.front = (cq.front + 1) % cq.capacity;
+        STATE_STORE["circular_queue"] = cloneState(cq);
+        pushFrame({ active: [cq.front], line: 3, vars: { dequeued: removed }, output: `Dequeued ${removed}`, desc: `Removed ${removed} and advanced FRONT pointer to [${cq.front}].` });
+      }
+      else if (op === "peek_circ") {
+        if (cq.size === 0) {
+          pushFrame({ line: 1, output: "Empty", desc: "Circular Queue is empty." });
+          return;
+        }
+        pushFrame({ found: [cq.front], line: 2, vars: { frontVal: cq.buffer[cq.front] }, output: `Front [${cq.front}] = ${cq.buffer[cq.front]}`, desc: `Front element is ${cq.buffer[cq.front]} at slot [${cq.front}].` });
+      }
+      else if (op === "search_circ") {
+        let foundSlot = -1;
+        for (let s = 0; s < cq.size; s++) {
+          const idx = (cq.front + s) % cq.capacity;
+          pushFrame({ active: [idx], line: 2, vars: { target: val, slot: idx, val: cq.buffer[idx] }, desc: `Checking ring slot [${idx}] = ${cq.buffer[idx]}.` });
+          if (cq.buffer[idx] === val) {
+            foundSlot = idx;
+            pushFrame({ found: [idx], line: 3, vars: { foundSlot: idx }, output: `Found ${val} at slot [${idx}]`, desc: `Target ${val} found in ring buffer slot [${idx}]!` });
+            break;
+          }
+        }
+        if (foundSlot === -1) pushFrame({ line: 5, output: `${val} Not Found`, desc: `Element ${val} not found in Circular Queue.` });
+      }
+    }
+
+    // ------------------- LINKED LIST OPERATIONS (SLL, DLL, CLL) -------------------
+    function runLinkedListOperation(op, val, idxIn) {
+      let list = [...STATE_STORE[currentSubtype]];
+      const pushFrame = (opts) => frames.push({
+        subtype: currentSubtype,
+        data: [...list],
+        active: opts.active || [],
+        mutate: opts.mutate || [],
+        found: opts.found || [],
+        visited: opts.visited || [],
+        line: opts.line || 0,
+        vars: opts.vars || {},
+        output: opts.output || "—",
+        desc: opts.desc || ""
+      });
+
+      if (op === "insert_head") {
+        pushFrame({ active: [0], line: 1, vars: { newVal: val }, desc: `Allocating new node [${val}] and linking its next pointer to current HEAD.` });
+        list.unshift(val);
+        STATE_STORE[currentSubtype] = [...list];
+        pushFrame({ found: [0], line: 3, vars: { newHead: val, length: list.length }, output: `New Head = ${val}`, desc: `Node [${val}] is now the new HEAD of the ${currentSubtype} linked list.` });
+      }
+      else if (op === "insert_tail") {
+        for (let i = 0; i < list.length; i++) {
+          pushFrame({ active: [i], visited: Array.from({ length: i }, (_, k) => k), line: 3, vars: { currIdx: i, currVal: list[i] }, desc: `Traversing to tail: currently at node [${list[i]}].` });
+        }
+        list.push(val);
+        STATE_STORE[currentSubtype] = [...list];
+        pushFrame({ found: [list.length - 1], line: 4, vars: { newTail: val, length: list.length }, output: `Appended ${val} at Tail`, desc: `Linked new node [${val}] at the TAIL.` });
+      }
+      else if (op === "insert_at") {
+        const idx = Math.max(0, Math.min(list.length, idxIn));
+        for (let i = 0; i < idx; i++) {
+          pushFrame({ active: [i], line: 2, vars: { pos: i, targetIdx: idx }, desc: `Advancing pointer to position ${i}...` });
+        }
+        list.splice(idx, 0, val);
+        STATE_STORE[currentSubtype] = [...list];
+        pushFrame({ found: [idx], line: 4, vars: { inserted: val, atIndex: idx }, output: `Inserted ${val} at [${idx}]`, desc: `Splice-linked node [${val}] at index [${idx}].` });
+      }
+      else if (op === "delete_val") {
+        let hit = -1;
+        for (let i = 0; i < list.length; i++) {
+          pushFrame({ active: [i], line: 2, vars: { target: val, checking: list[i] }, desc: `Checking node [${list[i]}] at index ${i}...` });
+          if (list[i] === val) { hit = i; break; }
+        }
+        if (hit !== -1) {
+          pushFrame({ mutate: [hit], line: 3, vars: { unlinking: val, index: hit }, desc: `Bypassing and unlinking node [${val}] at index ${hit}.` });
+          list.splice(hit, 1);
+          STATE_STORE[currentSubtype] = [...list];
+          pushFrame({ line: 3, vars: { deleted: val, newLength: list.length }, output: `Deleted node ${val}`, desc: `Node [${val}] unlinked and freed.` });
+        } else {
+          pushFrame({ line: 3, vars: { target: val, status: "Not Found" }, output: `${val} not in list`, desc: `Value ${val} was not found in the linked list.` });
+        }
+      }
+      else if (op === "delete_at") {
+        if (list.length === 0) return;
+        const idx = Math.max(0, Math.min(list.length - 1, idxIn));
+        for (let i = 0; i < idx; i++) {
+          pushFrame({ active: [i], line: 2, vars: { pos: i, targetIdx: idx }, desc: `Traversing to index ${idx} (at node ${list[i]})...` });
+        }
+        const removed = list[idx];
+        pushFrame({ mutate: [idx], line: 3, vars: { deleting: removed, index: idx }, desc: `Unlinking node [${removed}] at index [${idx}].` });
+        list.splice(idx, 1);
+        STATE_STORE[currentSubtype] = [...list];
+        pushFrame({ line: 3, vars: { deleted: removed, remaining: list.length }, output: `Deleted [${idx}] (${removed})`, desc: `Removed node at index [${idx}].` });
+      }
+      else if (op === "search_ll" || op === "traverse_ll") {
+        const visited = [];
+        const out = [];
+        let foundIdx = -1;
+        for (let i = 0; i < list.length; i++) {
+          out.push(list[i]);
+          pushFrame({
+            active: [i], visited: [...visited], line: 3,
+            vars: { index: i, nodeData: list[i] },
+            output: op === "traverse_ll" ? out.join(" → ") : `Scanning...`,
+            desc: `Visiting node [${i}] with data = ${list[i]}.`
+          });
+          if (op === "search_ll" && list[i] === val) {
+            foundIdx = i;
+            pushFrame({ found: [i], visited: [...visited], line: 3, vars: { target: val, foundIndex: i }, output: `Found ${val} at node [${i}]`, desc: `Target ${val} located at node index [${i}]!` });
+            break;
+          }
+          visited.push(i);
+        }
+        if (op === "search_ll" && foundIdx === -1) {
+          pushFrame({ visited, line: 6, vars: { target: val, found: -1 }, output: `${val} Not Found`, desc: `Reached end of list; ${val} not found.` });
+        }
+      }
+    }
+
+    // ------------------- BINARY TREE OPERATIONS (BST & COMPLETE TREE) -------------------
+    function buildTreeObject(values, isBST) {
+      if (!values || values.length === 0) return { nodes: [], rootId: null };
+      const nodes = [];
+
+      if (isBST) {
+        let rootId = null;
+        const insertRec = (currId, val, x, y, spread) => {
+          if (currId === null) {
+            const newId = nodes.length;
+            nodes.push({ id: newId, val, x, y, left: null, right: null });
+            return newId;
+          }
+          if (val < nodes[currId].val) {
+            nodes[currId].left = insertRec(nodes[currId].left, val, x - spread, y + 72, Math.max(38, spread * 0.54));
+          } else if (val > nodes[currId].val) {
+            nodes[currId].right = insertRec(nodes[currId].right, val, x + spread, y + 72, Math.max(38, spread * 0.54));
+          }
+          return currId;
+        };
+        values.forEach(v => { rootId = insertRec(rootId, v, 340, 44, 145); });
+        return { nodes, rootId };
+      } else {
+        // Complete Binary Tree level-order layout
+        values.forEach((v, i) => {
+          const level = Math.floor(Math.log2(i + 1));
+          const posInLevel = i - (Math.pow(2, level) - 1);
+          const totalInLevel = Math.pow(2, level);
+          const span = 640 / (totalInLevel + 1);
+          const x = Math.round(span * (posInLevel + 1)) + 20;
+          const y = 44 + level * 72;
+          nodes.push({
+            id: i,
+            val: v,
+            x,
+            y,
+            left: 2 * i + 1 < values.length ? 2 * i + 1 : null,
+            right: 2 * i + 2 < values.length ? 2 * i + 2 : null
+          });
+        });
+        return { nodes, rootId: 0 };
+      }
+    }
+
+    function runTreeOperation(op, val) {
+      const isBST = currentSubtype === "bst";
+      let arr = [...STATE_STORE[currentSubtype]];
+
+      const pushTreeFrame = (treeArr, opts) => frames.push({
+        subtype: currentSubtype,
+        data: [...treeArr],
+        active: opts.active || [],
+        mutate: opts.mutate || [],
+        found: opts.found || [],
+        visited: opts.visited || [],
+        line: opts.line || 0,
+        vars: opts.vars || {},
+        output: opts.output || "—",
+        desc: opts.desc || ""
+      });
+
+      if (op === "insert_tree") {
+        const treeObj = buildTreeObject(arr, isBST);
+        if (isBST) {
+          let curr = treeObj.rootId;
+          while (curr !== null) {
+            const n = treeObj.nodes[curr];
+            pushTreeFrame(arr, { active: [n.val], line: 2, vars: { inserting: val, comparingWith: n.val }, desc: `Comparing ${val} with node ${n.val}...` });
+            if (val === n.val) break;
+            curr = val < n.val ? n.left : n.right;
+          }
+        }
+        if (!arr.includes(val)) arr.push(val);
+        STATE_STORE[currentSubtype] = [...arr];
+        pushTreeFrame(arr, { found: [val], line: 4, vars: { insertedNode: val, totalNodes: arr.length }, output: `Inserted Node ${val}`, desc: `Inserted node ${val} into ${isBST ? "Binary Search Tree" : "Complete Binary Tree"}!` });
+      }
+
+      else if (op === "delete_tree") {
+        if (!arr.includes(val)) {
+          pushTreeFrame(arr, { line: 1, vars: { target: val, status: "Not Found" }, output: `${val} not in tree`, desc: `Node ${val} does not exist in the tree.` });
+          return;
+        }
+        pushTreeFrame(arr, { mutate: [val], line: 2, vars: { deleting: val }, desc: `Locating node ${val} and restructuring child links...` });
+        arr = arr.filter(x => x !== val);
+        STATE_STORE[currentSubtype] = [...arr];
+        pushTreeFrame(arr, { line: 5, vars: { deleted: val, remaining: arr.length }, output: `Deleted Node ${val}`, desc: `Removed node ${val} and rebalanced tree structure.` });
+      }
+
+      else if (op === "search_tree") {
+        const { nodes, rootId } = buildTreeObject(arr, isBST);
+        const visited = [];
+        let hit = false;
+        if (isBST) {
+          let curr = rootId;
+          while (curr !== null) {
+            const n = nodes[curr];
+            pushTreeFrame(arr, { active: [n.val], visited: [...visited], line: 2, vars: { target: val, current: n.val }, desc: `Comparing target ${val} with node ${n.val}...` });
+            if (n.val === val) {
+              hit = true;
+              pushTreeFrame(arr, { found: [n.val], visited: [...visited], line: 2, vars: { foundNode: n.val }, output: `Found Node ${val}`, desc: `Target node ${val} found in BST!` });
+              break;
+            }
+            visited.push(n.val);
+            curr = val < n.val ? n.left : n.right;
+          }
+        } else {
+          for (const n of nodes) {
+            pushTreeFrame(arr, { active: [n.val], visited: [...visited], line: 2, vars: { target: val, checking: n.val }, desc: `Scanning node ${n.val}...` });
+            if (n.val === val) {
+              hit = true;
+              pushTreeFrame(arr, { found: [n.val], visited: [...visited], line: 2, vars: { foundNode: n.val }, output: `Found Node ${val}`, desc: `Target node ${val} found!` });
+              break;
+            }
+            visited.push(n.val);
+          }
+        }
+        if (!hit) pushTreeFrame(arr, { visited, line: 4, vars: { target: val, result: "Not Found" }, output: `${val} Not Found`, desc: `Node ${val} was not found in the tree.` });
+      }
+
+      else if (["inorder", "preorder", "postorder", "levelorder"].includes(op)) {
+        const { nodes, rootId } = buildTreeObject(arr, isBST);
+        const visited = [];
+
+        const recordVisit = (n, lineNo, label) => {
+          visited.push(n.val);
+          pushTreeFrame(arr, {
+            active: [n.val],
+            visited: [...visited],
+            line: lineNo,
+            vars: { current: n.val, visitedCount: visited.length },
+            output: visited.join(" → "),
+            desc: `${label}: Visited node ${n.val}.`
+          });
+        };
+
+        if (op === "inorder") {
+          const dfs = (id) => {
+            if (id === null) return;
+            dfs(nodes[id].left);
+            recordVisit(nodes[id], 3, "In-Order (L→Root→R)");
+            dfs(nodes[id].right);
+          };
+          dfs(rootId);
+        } else if (op === "preorder") {
+          const dfs = (id) => {
+            if (id === null) return;
+            recordVisit(nodes[id], 2, "Pre-Order (Root→L→R)");
+            dfs(nodes[id].left);
+            dfs(nodes[id].right);
+          };
+          dfs(rootId);
+        } else if (op === "postorder") {
+          const dfs = (id) => {
+            if (id === null) return;
+            dfs(nodes[id].left);
+            dfs(nodes[id].right);
+            recordVisit(nodes[id], 4, "Post-Order (L→R→Root)");
+          };
+          dfs(rootId);
+        } else if (op === "levelorder") {
+          const q = rootId !== null ? [rootId] : [];
+          while (q.length > 0) {
+            const curr = q.shift();
+            const n = nodes[curr];
+            if (n.left !== null) q.push(n.left);
+            if (n.right !== null) q.push(n.right);
+            recordVisit(n, 4, "Level-Order (BFS)");
+          }
+        }
+      }
+    }
+
+    /***************************************************************************
+     * 7. GRAPHICAL STAGE RENDERERS (BESPOKE FOR EACH SUBTYPE)
+     ***************************************************************************/
+    function renderCodePanel(lines) {
+      codeBox.innerHTML = lines
+        .map((ln, idx) => `
+          <div id="codeline-${idx}" class="code-line px-3 py-1 flex items-center gap-3 text-slate-300">
+            <span class="w-5 text-right text-slate-600 select-none">${idx + 1}</span>
+            <span class="whitespace-pre">${ln}</span>
+          </div>
+        `).join("");
+    }
+
+    function renderFrame() {
+      const frame = frames[currentFrameIdx];
+      if (!frame) return;
+
+      // Banner & Step counter
+      stepBadge.textContent = `Step ${currentFrameIdx + 1} / ${frames.length}`;
+      stepExplanation.textContent = frame.desc;
+      outputTray.textContent = frame.output || "—";
+
+      const subtypeLabel = MENU_CONFIG[currentDS].subtypes[currentSubtype].label;
+      canvasTitleBadge.textContent = subtypeLabel;
+
+      // Highlight Active Code Line
+      document.querySelectorAll(".code-line").forEach(el => el.classList.remove("active-line"));
+      const activeLn = document.getElementById(`codeline-${frame.line}`);
+      if (activeLn) activeLn.classList.add("active-line");
+
+      // Render Watched Variables
+      const entries = Object.entries(frame.vars || {});
+      varsGrid.innerHTML = entries.map(([k, v]) => `
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2">
+          <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold truncate">${k}</div>
+          <div class="mono text-xs sm:text-sm font-extrabold text-sky-400 truncate mt-0.5">${v}</div>
+        </div>
+      `).join("");
+
+      // Dispatch Visual Renderer by Subtype
+      if (frame.subtype === "1d") render1DArray(frame);
+      else if (frame.subtype === "2d") render2DMatrix(frame);
+      else if (frame.subtype === "3d") render3DTensor(frame);
+      else if (frame.subtype === "array_stack" || frame.subtype === "linked_stack") renderStack(frame);
+      else if (["simple_queue", "deque", "priority_queue"].includes(frame.subtype)) renderLinearQueue(frame);
+      else if (frame.subtype === "circular_queue") renderCircularQueue(frame);
+      else if (["singly", "doubly", "circular"].includes(frame.subtype)) renderLinkedList(frame);
+      else if (["bst", "complete_tree"].includes(frame.subtype)) renderBinaryTree(frame);
+    }
+
+    // --- 1D Array Renderer ---
+    function render1DArray(frame) {
+      const arr = frame.data;
+      canvasMetaInfo.textContent = `Length: ${arr.length} | Contiguous Memory`;
+      const maxVal = Math.max(...arr.map(v => Math.abs(v)), 1);
+
+      visualStage.innerHTML = `
+        <div class="flex items-end justify-center gap-2.5 sm:gap-3.5 px-4 pt-8 pb-2 min-h-[270px]">
+          ${arr.map((val, idx) => {
+            const h = Math.max(40, Math.round((Math.abs(val) / maxVal) * 165));
+            let barGradient = "from-sky-400 to-indigo-500 text-slate-950";
+            let boxBorder = "border-slate-700 bg-slate-900/90 text-slate-300";
+
+            if (frame.visited?.includes(idx)) {
+              barGradient = "from-purple-400 to-indigo-600 text-white";
+              boxBorder = "border-purple-500/60 bg-purple-950/40 text-purple-200";
+            }
+            if (frame.active?.includes(idx)) {
+              barGradient = "from-amber-300 to-amber-500 text-slate-950 active-glow";
+              boxBorder = "border-amber-400 bg-amber-500/20 text-amber-200";
+            }
+            if (frame.mutate?.includes(idx)) {
+              barGradient = "from-rose-400 to-red-600 text-white active-glow";
+              boxBorder = "border-rose-400 bg-rose-500/20 text-rose-200";
+            }
+            if (frame.found?.includes(idx)) {
+              barGradient = "from-emerald-300 to-emerald-500 text-slate-950 active-glow";
+              boxBorder = "border-emerald-400 bg-emerald-500/20 text-emerald-200";
+            }
+
+            const ptr = frame.pointers?.[idx] || "";
+            return `
+              <div class="flex flex-col items-center gap-1.5 vis-transition">
+                <div class="w-11 sm:w-12 rounded-t-lg bg-gradient-to-t ${barGradient} flex items-end justify-center pb-2 font-extrabold text-xs mono shadow-lg vis-transition" style="height:${h}px">
+                  ${val}
+                </div>
+                <div class="w-11 sm:w-12 py-1 rounded-md border ${boxBorder} text-center mono text-[11px] font-bold">
+                  [${idx}]
+                </div>
+                <div class="h-5 flex items-center justify-center">
+                  ${ptr ? `<span class="px-1.5 py-0.5 rounded bg-sky-500/20 border border-sky-400/50 text-sky-300 mono text-[10px] font-bold whitespace-nowrap">${ptr}</span>` : ""}
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    // --- 2D Matrix Renderer ---
+    function render2DMatrix(frame) {
+      const mat = frame.data;
+      const R = mat.length, C = mat[0]?.length || 0;
+      canvasMetaInfo.textContent = `Dimensions: ${R} Rows × ${C} Cols (${R * C} cells)`;
+
+      let headerCols = `<tr><th class="p-2 text-[11px] text-slate-500 mono">R \\ C</th>`;
+      for (let c = 0; c < C; c++) {
+        headerCols += `<th class="p-2 text-xs font-bold text-indigo-400 mono">Col [${c}]</th>`;
+      }
+      headerCols += `</tr>`;
+
+      let rowsHtml = "";
+      for (let r = 0; r < R; r++) {
+        rowsHtml += `<tr><td class="p-2 text-xs font-bold text-sky-400 mono whitespace-nowrap">Row [${r}]</td>`;
+        for (let c = 0; c < C; c++) {
+          const key = `${r},${c}`;
+          let cellStyle = "bg-slate-900/90 border-slate-700 text-slate-100";
+          if (frame.visited?.includes(key)) cellStyle = "bg-purple-500/25 border-purple-400 text-purple-200";
+          if (frame.active?.includes(key)) cellStyle = "bg-amber-400 text-slate-950 border-amber-300 font-extrabold active-glow scale-105";
+          if (frame.found?.includes(key)) cellStyle = "bg-emerald-400 text-slate-950 border-emerald-300 font-extrabold active-glow scale-105";
+
+          rowsHtml += `
+            <td class="p-1.5">
+              <div class="w-16 h-14 rounded-xl border ${cellStyle} flex flex-col items-center justify-center vis-transition shadow-md">
+                <span class="text-[9px] opacity-70 mono">[${r}][${c}]</span>
+                <span class="text-sm font-extrabold mono">${mat[r][c]}</span>
+              </div>
+            </td>
+          `;
+        }
+        rowsHtml += `</tr>`;
+      }
+
+      visualStage.innerHTML = `
+        <div class="p-3 bg-slate-950/60 rounded-2xl border border-slate-800">
+          <table class="border-collapse">${headerCols}${rowsHtml}</table>
+        </div>
+      `;
+    }
+
+    // --- 3D Tensor Renderer ---
+    function render3DTensor(frame) {
+      const tensor = frame.data;
+      const D = tensor.length, R = tensor[0].length, C = tensor[0][0].length;
+      canvasMetaInfo.textContent = `Shape: ${D} Layers × ${R} Rows × ${C} Cols`;
+
+      visualStage.innerHTML = `
+        <div class="flex flex-wrap items-center justify-center gap-5 p-2">
+          ${tensor.map((layer, d) => `
+            <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-3.5 shadow-xl relative">
+              <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-slate-800">
+                <span class="text-xs font-extrabold uppercase tracking-wider text-purple-400 mono">Layer [d=${d}]</span>
+                <span class="text-[10px] text-slate-500 mono">${R}×${C} Slice</span>
+              </div>
+              <div class="grid gap-2" style="grid-template-columns: repeat(${C}, minmax(0, 1fr));">
+                ${layer.map((rowArr, r) => rowArr.map((val, c) => {
+                  const key = `${d},${r},${c}`;
+                  let cls = "bg-slate-900 border-slate-700 text-slate-200";
+                  if (frame.visited?.includes(key)) cls = "bg-purple-500/25 border-purple-400 text-purple-200";
+                  if (frame.active?.includes(key)) cls = "bg-amber-400 text-slate-950 border-amber-300 active-glow scale-105";
+                  if (frame.found?.includes(key)) cls = "bg-emerald-400 text-slate-950 border-emerald-300 active-glow scale-105";
+                  return `
+                    <div class="w-16 h-14 rounded-xl border ${cls} flex flex-col items-center justify-center vis-transition">
+                      <span class="text-[9px] opacity-75 mono">[${d}][${r}][${c}]</span>
+                      <span class="text-xs sm:text-sm font-extrabold mono">${val}</span>
+                    </div>
+                  `;
+                }).join("")).join("")}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    // --- Stack Renderer (Array Stack & Linked Stack) ---
+    function renderStack(frame) {
+      const stk = frame.data;
+      const isLinked = frame.subtype === "linked_stack";
+      canvasMetaInfo.textContent = `Height: ${stk.length} elements | LIFO (Last-In, First-Out)`;
+
+      if (stk.length === 0) {
+        visualStage.innerHTML = `<div class="text-slate-400 mono text-sm border-2 border-dashed border-slate-700 rounded-2xl px-8 py-12">[ Empty Stack (TOP = -1) ]</div>`;
+        return;
+      }
+
+      const itemsHtml = [...stk].map((val, idx) => ({ val, idx })).reverse().map(({ val, idx }) => {
+        const isTop = idx === stk.length - 1;
+        let cls = "bg-slate-900/95 border-sky-500/40 text-slate-100";
+        if (frame.active?.includes(idx)) cls = "bg-amber-400 text-slate-950 border-amber-300 active-glow";
+        if (frame.mutate?.includes(idx)) cls = "bg-rose-500 text-white border-rose-300 active-glow";
+        if (frame.found?.includes(idx)) cls = "bg-emerald-400 text-slate-950 border-emerald-300 active-glow";
+
+        return `
+          <div class="flex items-center gap-3">
+            <div class="w-20 text-right mono text-xs font-bold ${isTop ? 'text-emerald-400' : 'text-slate-500'}">
+              ${isTop ? 'TOP ➔' : `[${idx}]`}
+            </div>
+            <div class="w-44 py-2.5 px-4 rounded-xl border-2 ${cls} flex items-center justify-between shadow-md vis-transition">
+              <span class="mono font-extrabold text-sm">${val}</span>
+              <span class="mono text-[10px] opacity-75">${isLinked ? '• next ↓' : `0x${(100 + idx * 4).toString(16)}`}</span>
+            </div>
+          </div>
+          ${isLinked && idx > 0 ? `<div class="pl-20 text-sky-400 text-xs font-bold">↓</div>` : ""}
+        `;
+      }).join("");
+
+      visualStage.innerHTML = `
+        <div class="flex flex-col items-center justify-center py-2">
+          <div class="text-[10px] uppercase tracking-widest text-sky-400 font-bold mb-2">⬆ Push / Pop Portal (LIFO) ⬆</div>
+          <div class="flex flex-col items-center gap-1.5 border-x-4 border-b-4 border-slate-700/90 rounded-b-2xl px-6 pb-4 pt-2 bg-slate-950/50">
+            ${itemsHtml}
+            ${isLinked ? `<div class="pl-20 mt-1 text-[11px] mono text-rose-400 font-bold">NULL (Bottom)</div>` : ""}
+          </div>
+        </div>
+      `;
+    }
+
+    // --- Linear Queue, Deque & Priority Queue Renderer ---
+    function renderLinearQueue(frame) {
+      const q = frame.data;
+      const isDeque = frame.subtype === "deque";
+      const isPQ = frame.subtype === "priority_queue";
+      canvasMetaInfo.textContent = `Length: ${q.length} | ${isDeque ? "Double-Ended (Front & Rear)" : isPQ ? "Min-Priority Ordered" : "FIFO Pipe"}`;
+
+      if (q.length === 0) {
+        visualStage.innerHTML = `<div class="text-slate-400 mono text-sm border-2 border-dashed border-slate-700 rounded-2xl px-8 py-10">[ Empty Queue ]</div>`;
+        return;
+      }
+
+      visualStage.innerHTML = `
+        <div class="flex flex-col items-center gap-4">
+          <div class="flex items-center gap-2 text-xs font-bold text-slate-400">
+            <span>${isDeque ? "⇄ Insert / Delete FRONT" : "⬅ Dequeue (FRONT)"}</span>
+            <span class="text-slate-600">|</span>
+            <span>${isDeque ? "Insert / Delete REAR ⇄" : "Enqueue (REAR) ⬅"}</span>
+          </div>
+          <div class="flex items-center gap-2.5 px-6 py-5 border-y-4 border-slate-700 bg-slate-950/60 rounded-xl overflow-x-auto max-w-full">
+            ${q.map((val, idx) => {
+              let cls = "bg-slate-900 border-sky-500/40 text-slate-100";
+              if (frame.active?.includes(idx)) cls = "bg-amber-400 text-slate-950 border-amber-300 active-glow";
+              if (frame.mutate?.includes(idx)) cls = "bg-rose-500 text-white border-rose-300 active-glow";
+              if (frame.found?.includes(idx)) cls = "bg-emerald-400 text-slate-950 border-emerald-300 active-glow";
+
+              const badge = idx === 0 && idx === q.length - 1 ? "FRONT & REAR" : idx === 0 ? "FRONT" : idx === q.length - 1 ? "REAR" : isPQ ? `P#${idx + 1}` : `[${idx}]`;
+              return `
+                <div class="flex flex-col items-center gap-1.5">
+                  <span class="text-[10px] mono font-bold ${idx === 0 ? 'text-emerald-400' : idx === q.length - 1 ? 'text-indigo-400' : 'text-slate-500'}">${badge}</span>
+                  <div class="w-16 h-16 rounded-xl border-2 ${cls} flex flex-col items-center justify-center shadow-lg vis-transition">
+                    <span class="mono font-extrabold text-base">${val}</span>
+                    <span class="text-[9px] opacity-70 mono">idx ${idx}</span>
+                  </div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    // --- Circular Queue (SVG Ring Buffer) Renderer ---
+    function renderCircularQueue(frame) {
+      const { buffer, front, rear, size, capacity } = frame.data;
+      canvasMetaInfo.textContent = `Ring Capacity: ${size} / ${capacity} slots | Modulo Wrap-Around`;
+
+      const cx = 190, cy = 155, r = 105;
+      let slotsSvg = "";
+
+      for (let i = 0; i < capacity; i++) {
+        const angle = (i / capacity) * 2 * Math.PI - Math.PI / 2;
+        const x = cx + r * Math.cos(angle);
+        const y = cy + r * Math.sin(angle);
+        const val = buffer[i];
+
+        let fill = val !== null ? "#0f172a" : "#090d16";
+        let stroke = val !== null ? "#38bdf8" : "#334155";
+        let textFill = val !== null ? "#f8fafc" : "#475569";
+
+        if (frame.active?.includes(i)) { fill = "#f59e0b"; stroke = "#fde68a"; textFill = "#090d16"; }
+        if (frame.mutate?.includes(i)) { fill = "#ef4444"; stroke = "#fecaca"; textFill = "#ffffff"; }
+        if (frame.found?.includes(i)) { fill = "#10b981"; stroke = "#a7f3d0"; textFill = "#090d16"; }
+
+        const isF = size > 0 && i === front;
+        const isR = size > 0 && i === rear;
+        const ptrLabel = isF && isR ? "F/R" : isF ? "FRONT" : isR ? "REAR" : "";
+
+        slotsSvg += `
+          <g transform="translate(${x}, ${y})">
+            <circle r="26" fill="${fill}" stroke="${stroke}" stroke-width="3" />
+            <text text-anchor="middle" dy="-2" fill="${textFill}" font-weight="800" font-size="13" class="mono">
+              ${val !== null ? val : "—"}
+            </text>
+            <text text-anchor="middle" dy="13" fill="${textFill}" opacity="0.75" font-size="9" class="mono">
+              [${i}]
+            </text>
+            ${ptrLabel ? `
+              <rect x="-22" y="-42" width="44" height="14" rx="4" fill="${isF ? '#10b981' : '#818cf8'}" />
+              <text text-anchor="middle" y="-32" fill="#090d16" font-weight="800" font-size="9" class="mono">${ptrLabel}</text>
+            ` : ""}
+          </g>
+        `;
+      }
+
+      visualStage.innerHTML = `
+        <svg width="380" height="310" viewBox="0 0 380 310">
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1e293b" stroke-width="22" stroke-dasharray="6 4" />
+          <circle cx="${cx}" cy="${cy}" r="48" fill="#0f172a" stroke="#334155" stroke-width="2" />
+          <text x="${cx}" y="${cy - 6}" text-anchor="middle" fill="#38bdf8" font-weight="800" font-size="11" class="mono">RING BUFFER</text>
+          <text x="${cx}" y="${cy + 12}" text-anchor="middle" fill="#94a3b8" font-weight="700" font-size="10" class="mono">F:${front} | R:${rear}</text>
+          ${slotsSvg}
+        </svg>
+      `;
+    }
+
+    // --- Linked List Renderer (Singly, Doubly, Circular) ---
+    function renderLinkedList(frame) {
+      const list = frame.data;
+      const isDoubly = frame.subtype === "doubly";
+      const isCircular = frame.subtype === "circular";
+      canvasMetaInfo.textContent = `Nodes: ${list.length} | Dynamic Heap Allocation`;
+
+      if (list.length === 0) {
+        visualStage.innerHTML = `<div class="text-slate-400 mono text-sm border-2 border-dashed border-slate-700 rounded-2xl px-8 py-10">HEAD ➔ NULL (Empty List)</div>`;
+        return;
+      }
+
+      visualStage.innerHTML = `
+        <div class="flex flex-col items-center gap-3 max-w-full overflow-x-auto px-4 py-6">
+          <div class="flex items-center gap-2">
+            ${isDoubly ? `<div class="px-2.5 py-1 rounded bg-rose-500/15 border border-rose-500/40 text-rose-300 mono text-xs font-bold">NULL ⬅</div>` : ""}
+            ${list.map((val, idx) => {
+              let cls = "bg-slate-900 border-sky-500/50 text-slate-100";
+              if (frame.visited?.includes(idx)) cls = "bg-purple-950/60 border-purple-400 text-purple-200";
+              if (frame.active?.includes(idx)) cls = "bg-amber-400 text-slate-950 border-amber-300 active-glow";
+              if (frame.mutate?.includes(idx)) cls = "bg-rose-500 text-white border-rose-300 active-glow";
+              if (frame.found?.includes(idx)) cls = "bg-emerald-400 text-slate-950 border-emerald-300 active-glow";
+
+              const role = idx === 0 ? "HEAD [0]" : idx === list.length - 1 ? `TAIL [${idx}]` : `Node [${idx}]`;
+              return `
+                <div class="flex items-center gap-1.5">
+                  <div class="flex flex-col items-center">
+                    <span class="text-[10px] mono font-bold ${idx === 0 ? 'text-emerald-400' : idx === list.length - 1 ? 'text-indigo-400' : 'text-slate-400'} mb-1">${role}</span>
+                    <div class="rounded-xl border-2 ${cls} px-3 py-2 flex items-center gap-2 shadow-lg vis-transition">
+                      ${isDoubly ? `<span class="text-[10px] mono opacity-70 border-r border-current pr-1.5">•prev</span>` : ""}
+                      <span class="mono font-extrabold text-sm px-1">${val}</span>
+                      <span class="text-[10px] mono opacity-70 border-l border-current pl-1.5">next•</span>
+                    </div>
+                  </div>
+                  ${idx < list.length - 1 ? `
+                    <span class="text-sky-400 font-extrabold text-base mt-4 px-0.5">${isDoubly ? "⇄" : "➔"}</span>
+                  ` : ""}
+                </div>
+              `;
+            }).join("")}
+            ${!isCircular ? `
+              <span class="text-sky-400 font-extrabold text-base mt-4">➔</span>
+              <div class="mt-4 px-2.5 py-1.5 rounded-lg bg-rose-500/15 border border-rose-500/40 text-rose-300 mono text-xs font-bold">NULL</div>
+            ` : `
+              <div class="mt-4 px-2.5 py-1.5 rounded-lg bg-indigo-500/20 border border-indigo-400/50 text-indigo-300 mono text-xs font-bold">↩ HEAD [0]</div>
+            `}
+          </div>
+          ${isCircular ? `
+            <div class="w-4/5 h-6 border-b-2 border-x-2 border-dashed border-indigo-400/70 rounded-b-2xl flex items-center justify-center">
+              <span class="text-[10px] mono font-bold text-indigo-300 bg-slate-950 px-2 -mb-3">Circular Tail.next ➔ Head[0]</span>
+            </div>
+          ` : ""}
+        </div>
+      `;
+    }
+
+    // --- Binary Tree (SVG Hierarchical Node-Link) Renderer ---
+    function renderBinaryTree(frame) {
+      const isBST = frame.subtype === "bst";
+      const { nodes } = buildTreeObject(frame.data, isBST);
+      canvasMetaInfo.textContent = `Nodes: ${nodes.length} | ${isBST ? "BST (Left < Root < Right)" : "Complete Binary Tree"}`;
+
+      if (nodes.length === 0) {
+        visualStage.innerHTML = `<div class="text-slate-400 mono text-sm border-2 border-dashed border-slate-700 rounded-2xl px-8 py-10">[ Empty Binary Tree (root = NULL) ]</div>`;
+        return;
+      }
+
+      let edgesSvg = "";
+      nodes.forEach(n => {
+        if (n.left !== null && nodes[n.left]) {
+          const c = nodes[n.left];
+          edgesSvg += `<line x1="${n.x}" y1="${n.y}" x2="${c.x}" y2="${c.y}" stroke="#334155" stroke-width="3" />`;
+        }
+        if (n.right !== null && nodes[n.right]) {
+          const c = nodes[n.right];
+          edgesSvg += `<line x1="${n.x}" y1="${n.y}" x2="${c.x}" y2="${c.y}" stroke="#334155" stroke-width="3" />`;
+        }
+      });
+
+      const nodesSvg = nodes.map(n => {
+        let fill = "#0f172a";
+        let stroke = "#38bdf8";
+        let textFill = "#f8fafc";
+
+        if (frame.visited?.includes(n.val)) { fill = "#581c87"; stroke = "#c084fc"; textFill = "#f3e8ff"; }
+        if (frame.active?.includes(n.val)) { fill = "#f59e0b"; stroke = "#fde68a"; textFill = "#090d16"; }
+        if (frame.mutate?.includes(n.val)) { fill = "#ef4444"; stroke = "#fecaca"; textFill = "#ffffff"; }
+        if (frame.found?.includes(n.val)) { fill = "#10b981"; stroke = "#a7f3d0"; textFill = "#090d16"; }
+
+        return `
+          <g transform="translate(${n.x}, ${n.y})">
+            <circle r="22" fill="${fill}" stroke="${stroke}" stroke-width="3.5" />
+            <text text-anchor="middle" dy="5" fill="${textFill}" font-weight="800" font-size="13" class="mono">${n.val}</text>
+          </g>
+        `;
+      }).join("");
+
+      visualStage.innerHTML = `
+        <svg width="680" height="290" viewBox="0 0 680 290" class="max-w-full h-auto">
+          ${edgesSvg}
+          ${nodesSvg}
+        </svg>
+      `;
+    }
+
+    /***************************************************************************
+     * 8. PLAYBACK CONTROLLER & CUSTOM DATASET HANDLERS
+     ***************************************************************************/
+    function startPlayback() {
+      stopPlayback();
+      if (frames.length <= 1) return;
+      playBtn.textContent = "⏸ Pause";
+      const delay = 1320 - Number(speedSlider.value);
+      playTimer = setInterval(() => {
+        if (currentFrameIdx < frames.length - 1) {
+          currentFrameIdx++;
+          renderFrame();
+        } else {
+          stopPlayback();
+        }
+      }, delay);
+    }
+
+    function stopPlayback() {
+      if (playTimer) clearInterval(playTimer);
+      playTimer = null;
+      playBtn.textContent = "▶ Play";
+    }
+
+    function parseAndLoadCustomDataset(nums) {
+      if (nums.length === 0) return;
+
+      if (currentSubtype === "2d") {
+        const cols = 4, rows = Math.max(2, Math.min(4, Math.ceil(nums.length / cols)));
+        const mat = [];
+        let k = 0;
+        for (let r = 0; r < rows; r++) {
+          const rowArr = [];
+          for (let c = 0; c < cols; c++) {
+            rowArr.push(nums[k % nums.length]);
+            k++;
+          }
+          mat.push(rowArr);
+        }
+        STATE_STORE["2d"] = mat;
+      } else if (currentSubtype === "3d") {
+        let k = 0;
+        const tensor = [];
+        for (let d = 0; d < 3; d++) {
+          const layer = [];
+          for (let r = 0; r < 2; r++) {
+            const rowArr = [];
+            for (let c = 0; c < 3; c++) {
+              rowArr.push(nums[k % nums.length]);
+              k++;
+            }
+            layer.push(rowArr);
+          }
+          tensor.push(layer);
+        }
+        STATE_STORE["3d"] = tensor;
+      } else if (currentSubtype === "circular_queue") {
+        const cap = 8;
+        const slice = nums.slice(0, cap);
+        const buf = Array(cap).fill(null);
+        slice.forEach((v, i) => buf[i] = v);
+        STATE_STORE["circular_queue"] = {
+          buffer: buf,
+          front: 0,
+          rear: Math.max(0, slice.length - 1),
+          size: slice.length,
+          capacity: cap
+        };
+      } else if (currentSubtype === "priority_queue") {
+        STATE_STORE["priority_queue"] = [...nums].slice(0, 10).sort((a, b) => a - b);
+      } else {
+        STATE_STORE[currentSubtype] = [...nums].slice(0, 10);
+      }
+
+      syncDatasetInputBox();
+      renderInitialIdleFrame();
+      showToast("Dataset loaded into structure!");
+    }
+
+    // Event bindings
+    dsSelect.addEventListener("change", () => { window.location.hash = dsSelect.value; });
+    subtypeSelect.addEventListener("change", updateOperationMenu);
+    opSelect.addEventListener("change", () => {
+      updateParameterInputs();
+      renderInitialIdleFrame();
+    });
+
+    executeBtn.addEventListener("click", executeOperation);
+
+    loadDataBtn.addEventListener("click", () => {
+      const nums = datasetInput.value
+        .split(",")
+        .map(s => parseInt(s.trim(), 10))
+        .filter(n => !isNaN(n));
+      parseAndLoadCustomDataset(nums);
+    });
+
+    randomDataBtn.addEventListener("click", () => {
+      const count = currentSubtype === "2d" ? 12 : currentSubtype === "3d" ? 18 : 7;
+      const randNums = Array.from({ length: count }, () => Math.floor(Math.random() * 89) + 10);
+      parseAndLoadCustomDataset(randNums);
+    });
+
+    playBtn.addEventListener("click", () => {
+      if (playTimer) {
+        stopPlayback();
+      } else {
+        if (currentFrameIdx >= frames.length - 1) currentFrameIdx = 0;
+        startPlayback();
+      }
+    });
+
+    firstBtn.addEventListener("click", () => { stopPlayback(); currentFrameIdx = 0; renderFrame(); });
+    lastBtn.addEventListener("click", () => { stopPlayback(); currentFrameIdx = frames.length - 1; renderFrame(); });
+    prevBtn.addEventListener("click", () => {
+      stopPlayback();
+      if (currentFrameIdx > 0) { currentFrameIdx--; renderFrame(); }
+    });
+    nextBtn.addEventListener("click", () => {
+      stopPlayback();
+      if (currentFrameIdx < frames.length - 1) { currentFrameIdx++; renderFrame(); }
+    });
+
+    speedSlider.addEventListener("input", () => {
+      if (playTimer) startPlayback();
+    });
+
+    // Internal pages: one downloadable file, browser Back/Forward supported.
+    const pageNames = { array: "Arrays", stack: "Stacks", queue: "Queues", linkedlist: "Linked Lists", tree: "Trees" };
+    function openPage() {
+      stopPlayback();
+      const page = window.location.hash.slice(1);
+      const isLab = Object.prototype.hasOwnProperty.call(pageNames, page);
+      document.getElementById("homePage").hidden = isLab;
+      document.getElementById("labHeader").hidden = !isLab;
+      document.getElementById("labWorkspace").hidden = !isLab;
+      document.title = (isLab ? pageNames[page] : "Home") + " | CodeLens Studio Pro";
+      if (isLab) {
+        dsSelect.value = page;
+        updateSubtypeMenu();
+        const heading = document.getElementById("labPageTitle");
+        heading.textContent = pageNames[page] + " Laboratory";
+        visualStage.scrollTop = 0;
+        visualStage.scrollLeft = 0;
+        heading.focus({preventScroll: true});
+      }
+      window.scrollTo(0, 0);
+    }
+    window.addEventListener("hashchange", openPage);
+    window.addEventListener("load", openPage);
+  </script>
+</body>
+</html>
