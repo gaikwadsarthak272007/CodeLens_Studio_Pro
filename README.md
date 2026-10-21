@@ -33,9 +33,7 @@ CodeLens Studio Pro is an interactive web platform designed to help students, de
 ## 🚀 Live Demo
 
 Once deployed on GitHub Pages, visit:
-```text
-https://<YOUR-GITHUB-USERNAME>.github.io/<YOUR-REPO-NAME>/
-```
+[https://gaikwadsarthak272007.github.io/CodeLens_Studio_Pro/](https://gaikwadsarthak272007.github.io/CodeLens_Studio_Pro/)
 
 ---
 
@@ -45,8 +43,8 @@ No Node.js or build steps required! Simply:
 
 1. Clone or download this repository:
    ```bash
-   git clone https://github.com/<YOUR-GITHUB-USERNAME>/<YOUR-REPO-NAME>.git
-   cd <YOUR-REPO-NAME>
+   git clone https://github.com/gaikwadsarthak272007/CodeLens_Studio_Pro.git
+   cd CodeLens_Studio_Pro
    ```
 
 2. Open `index.html` directly in your browser:
@@ -81,3 +79,4 @@ No Node.js or build steps required! Simply:
 ## 📄 License
 
 This project is licensed under the MIT License - feel free to customize and expand it!
+
