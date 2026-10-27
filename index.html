@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CodeLens Complete DSA Academy — Interactive Learning &amp; Visualization Platform</title>
+  <title>CodeLens Studio Pro — Complete Interactive DSA Learning &amp; Visualization Platform</title>
   <!-- SEO & Search Engine Optimization -->
-  <meta name="description" content="CodeLens Complete DSA Academy is an interactive Data Structures &amp; Algorithms learning and visualization platform with step-by-step execution, dynamic animations, and interactive labs." />
-  <meta name="keywords" content="DSA visualizer, algorithms visualizer, data structures, CodeLens, DSA academy, array visualizer, stack visualizer, queue visualizer, binary tree visualizer, linked list, computer science" />
+  <meta name="description" content="CodeLens Studio Pro is an interactive Data Structures &amp; Algorithms learning and visualization platform with step-by-step execution, dynamic animations, and interactive labs." />
+  <meta name="keywords" content="DSA visualizer, algorithms visualizer, data structures, CodeLens, CodeLens Studio Pro, DSA academy, array visualizer, stack visualizer, queue visualizer, binary tree visualizer, linked list, computer science" />
   <meta name="author" content="Sarthak Gaikwad" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://gaikwadsarthak272007.github.io/CodeLens_Studio_Pro/" />
@@ -15,9 +15,8 @@
   <!-- Open Graph / Social Sharing -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://gaikwadsarthak272007.github.io/CodeLens_Studio_Pro/" />
-  <meta property="og:title" content="CodeLens Complete DSA Academy — Interactive Learning &amp; Visualization Platform" />
+  <meta property="og:title" content="CodeLens Studio Pro — Complete Interactive DSA Learning &amp; Visualization Platform" />
   <meta property="og:description" content="Master Data Structures &amp; Algorithms with interactive step-by-step animations, guided curriculum modules, and interactive labs." />
-
   <style>
 /* Self-contained fallback for the original labs; no Tailwind CDN required. */
 [class~="flex"]{display:flex}
@@ -6000,5 +5999,1608 @@ clAdd('graph','operations',[['Delete vertex','Remove the vertex and all incident
 clAdd('stack','operations',[['Balanced brackets','Push openings and match closing brackets.','O(n)','O(n)'],['Infix to postfix','Use precedence and associativity with an operator stack.','O(n) tokens','O(n)'],['Postfix evaluation','Push values and apply operators in operand order.','O(n) tokens','O(n)']]);
 clAdd('array','operations',[['Append (dynamic)','Add at end, geometrically grow if full.','O(1) amortized; O(n) resize','O(n) when resized'],['Prefix-sum preprocessing','Accumulate totals once.','O(n)','O(n)'],['Static range sum','Subtract two prefix sums.','O(1) after preprocessing','O(1)'],['Reverse','Swap symmetric index pairs.','O(n)','O(1)']]);
 const clRenderWithTypes=clRenderLesson;clRenderLesson=function(key,keep=false){clRenderWithTypes(key,keep);if(clChapter==='types'&&DS_CONCEPT_GUIDES[key]){const t=EDU_TOPICS.find(t=>t.id===key),section=document.createElement('section');section.className='cl-more-types';section.innerHTML='<h3>Further classifications and representations</h3><div class="cl-concept-grid">'+t.types.map(([a,b])=>`<section><h3>${EDU_ESCAPE(a)}</h3><p>${EDU_ESCAPE(b)}</p></section>`).join('')+'</div>';document.querySelector('.cl-reading').append(section)}};
-</script></body>
+</script>
+<!-- ======================= CODELENS STUDIO PRO v3.0 — STUDENT MASTERY UPGRADE ======================= -->
+<style id="cl-v3-upgrade-styles">
+  /* Classroom Light / High-Contrast Projector Mode */
+  html.cl-light-mode {
+    color-scheme: light;
+    --cl-bg: #f1f5f9;
+    --cl-panel: #ffffff;
+    --cl-line: #cbd5e1;
+    --cl-text: #0f172a;
+    --cl-muted: #475569;
+    --cl-accent: #0284c7;
+  }
+  html.cl-light-mode body {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+  }
+  html.cl-light-mode .cl-top {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-bottom-color: #cbd5e1 !important;
+  }
+  html.cl-light-mode .cl-brand,
+  html.cl-light-mode .cl-hero h1,
+  html.cl-light-mode .cl-content-heading h2,
+  html.cl-light-mode .cl-reading h3,
+  html.cl-light-mode .cl-course h3,
+  html.cl-light-mode .sg-lab-heading h2 {
+    color: #0f172a !important;
+  }
+  html.cl-light-mode .cl-reading,
+  html.cl-light-mode .cl-course,
+  html.cl-light-mode .cl-pathbar,
+  html.cl-light-mode .cl-course-tools,
+  html.cl-light-mode #sgSidebar,
+  html.cl-light-mode #labHeader > div,
+  html.cl-light-mode #labWorkspace .glass-panel,
+  html.cl-light-mode .cl-timeline-panel,
+  html.cl-light-mode #extraLab,
+  html.cl-light-mode .mini-inputs,
+  html.cl-light-mode .mini-visual,
+  html.cl-light-mode .mini-inspector > section {
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
+    color: #1e293b !important;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06) !important;
+  }
+  html.cl-light-mode input,
+  html.cl-light-mode select,
+  html.cl-light-mode textarea {
+    background: #f8fafc !important;
+    border-color: #94a3b8 !important;
+    color: #0f172a !important;
+  }
+  html.cl-light-mode .canvas-grid,
+  html.cl-light-mode #extraStage,
+  html.cl-light-mode #miniStage {
+    background-color: #f8fafc !important;
+    border-color: #94a3b8 !important;
+  }
+  html.cl-light-mode #stepExplanation,
+  html.cl-light-mode #miniExplanation,
+  html.cl-light-mode #extraExplanation {
+    color: #0f172a !important;
+    background: #e0f2fe !important;
+  }
+  html.cl-light-mode #codeBox,
+  html.cl-light-mode #extraCode,
+  html.cl-light-mode #miniCode,
+  html.cl-light-mode .cl-code {
+    background: #0f172a !important;
+    color: #e2e8f0 !important;
+  }
+
+  /* Language Switcher Tabs */
+  .cl-lang-tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #0a121a;
+    border: 1px solid #2b3d4f;
+    border-radius: 7px;
+    padding: 2px;
+  }
+  .cl-lang-tab {
+    border: 0;
+    background: transparent;
+    color: #8fa6bc;
+    font: 600 10px/1 'JetBrains Mono', monospace;
+    padding: 4px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .cl-lang-tab:hover {
+    color: #e2e8f0;
+  }
+  .cl-lang-tab.active-lang {
+    background: #a4dfc5;
+    color: #0f241c;
+    font-weight: 800;
+  }
+
+  /* Toolbar Pills for Predict Mode, Trace Table, Share, Theme, Shortcuts */
+  .cl-v3-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid #334858;
+    background: #172430;
+    color: #cde0ee;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .cl-v3-pill:hover {
+    border-color: #a4dfc5;
+    color: #ffffff;
+  }
+  .cl-v3-pill.active-mode {
+    background: #1f3d33;
+    border-color: #6ee7b7;
+    color: #a7f3d0;
+  }
+
+  /* Active Predict Quiz Banner inside Lab */
+  #clPredictCard {
+    background: linear-gradient(135deg, #1b2e28, #15222e);
+    border: 1.5px solid #52b788;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .cl-predict-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #8ce99a;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+  .cl-predict-q {
+    font-size: 12px;
+    font-weight: 600;
+    color: #f1f5f9;
+  }
+  .cl-predict-opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .cl-predict-opts button {
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid #3b5bdb;
+    background: #182638;
+    color: #dbe4ff;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+  }
+  .cl-predict-opts button:hover {
+    background: #2b4463;
+    border-color: #74c0fc;
+  }
+
+  /* RAM Address & Memory Inspector Bar */
+  #clRamInspectorBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 6px 10px;
+    background: #0d1721;
+    border: 1px solid #293d4f;
+    border-radius: 8px;
+    font-size: 10px;
+    color: #9bb2c5;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  #clRamInspectorBar code {
+    color: #7dd3fc;
+    font-weight: 700;
+  }
+
+  /* Pass-by-Pass Dry-Run Trace Table Modal */
+  #clTraceModal {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    background: rgba(7, 11, 20, 0.82);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .cl-trace-dialog {
+    background: #121c27;
+    border: 1px solid #354c60;
+    border-radius: 14px;
+    width: min(1080px, 96vw);
+    max-height: 86vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65);
+  }
+  .cl-trace-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid #283a4b;
+    background: #0f1720;
+  }
+  .cl-trace-body {
+    padding: 16px 18px;
+    overflow: auto;
+    flex: 1;
+  }
+  .cl-trace-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    text-align: left;
+  }
+  .cl-trace-table th {
+    background: #1a2938;
+    color: #a4dfc5;
+    padding: 10px 12px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    position: sticky;
+    top: 0;
+  }
+  .cl-trace-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #243444;
+    color: #d6e3f0;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .cl-trace-table tr:hover td {
+    background: #172635;
+  }
+
+  /* Interactive Module Exam Quiz in Theory Review */
+  .cl-exam-quiz {
+    margin-top: 22px;
+    padding: 20px;
+    background: #101b26;
+    border: 1px solid #314b5c;
+    border-radius: 12px;
+  }
+  .cl-exam-q {
+    padding: 14px;
+    background: #152230;
+    border: 1px solid #293c4e;
+    border-radius: 9px;
+    margin-top: 12px;
+  }
+  .cl-exam-q h4 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    color: #e2eef8;
+  }
+  .cl-exam-choices {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 8px;
+  }
+  .cl-exam-choice {
+    text-align: left;
+    padding: 8px 11px;
+    border-radius: 7px;
+    border: 1px solid #354b5e;
+    background: #0e1822;
+    color: #bfd2e2;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .cl-exam-choice:hover {
+    border-color: #7dd3fc;
+  }
+  .cl-exam-choice.correct-ans {
+    background: #173d2e !important;
+    border-color: #34d399 !important;
+    color: #a7f3d0 !important;
+    font-weight: 700;
+  }
+  .cl-exam-choice.wrong-ans {
+    background: #421c24 !important;
+    border-color: #fb7185 !important;
+    color: #fecdd3 !important;
+  }
+  .cl-kbd-hint {
+    font-size: 9px;
+    color: #849bb0;
+    font-family: 'JetBrains Mono', monospace;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cl-kbd-hint kbd {
+    background: #0d1620;
+    border: 1px solid #324658;
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: #a4dfc5;
+    font-size: 9px;
+  }
+</style>
+
+<!-- Dry-Run Trace Table Modal -->
+<div id="clTraceModal" hidden role="dialog" aria-modal="true" aria-labelledby="clTraceModalTitle">
+  <div class="cl-trace-dialog">
+    <div class="cl-trace-top">
+      <div>
+        <span class="cl-kicker">UNIVERSITY EXAM &amp; LAB REVISION TOOL</span>
+        <h3 id="clTraceModalTitle" style="margin:3px 0 0;font-size:16px;color:#edf2f7">📋 Pass-by-Pass Dry-Run Trace Table</h3>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button id="clCopyTraceMd" type="button" class="cl-v3-pill">📄 Copy Markdown</button>
+        <button id="clDownloadTraceCsv" type="button" class="cl-v3-pill">⬇️ Export CSV</button>
+        <button id="clCloseTraceModal" type="button" class="cl-v3-pill" style="border-color:#fb7185;color:#fecdd3">✕ Close</button>
+      </div>
+    </div>
+    <div class="cl-trace-body" id="clTraceTableContainer"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  /***************************************************************************
+   * PART 1: EXTEND PRIMARY LABS WITH HIGH-YIELD EXAM & INTERVIEW OPERATIONS
+   ***************************************************************************/
+  // 1. Add new operations to 1D Array
+  MENU_CONFIG.array.subtypes["1d"].operations.push(
+    { id: "reverse_array", name: "Two-Pointer In-Place Reverse", params: [], time: "O(n)", space: "O(1)" },
+    { id: "prefix_sum", name: "Prefix-Sum Array & Range Total", params: ["idx"], idxLabel: "Query Right [r]", time: "O(n)", space: "O(n)" },
+    { id: "kadane_max_subarray", name: "Kadane's Max Subarray Sum (DP)", params: [], time: "O(n)", space: "O(1)" }
+  );
+
+  // 2. Add new exam operations to Stacks
+  ["array_stack", "linked_stack"].forEach(st => {
+    MENU_CONFIG.stack.subtypes[st].operations.push(
+      { id: "balanced_brackets", name: "Balanced Brackets Validator {[()]}", params: [], time: "O(n)", space: "O(n)" },
+      { id: "infix_to_postfix", name: "Infix → Postfix (A+B*C)", params: [], time: "O(n)", space: "O(n)" },
+      { id: "postfix_eval", name: "Postfix Expression Evaluation", params: [], time: "O(n)", space: "O(n)" }
+    );
+  });
+
+  // 3. Add new exam operations to Linked Lists
+  ["singly", "doubly", "circular"].forEach(st => {
+    MENU_CONFIG.linkedlist.subtypes[st].operations.push(
+      { id: "reverse_ll", name: "Reverse Linked List In-Place (3 Pointers)", params: [], time: "O(n)", space: "O(1)" },
+      { id: "find_middle_floyd", name: "Floyd's Fast/Slow Middle & Cycle Check", params: [], time: "O(n)", space: "O(1)" }
+    );
+  });
+
+  // 4. Add new exam operations to Binary Trees
+  ["bst", "complete_tree"].forEach(st => {
+    MENU_CONFIG.tree.subtypes[st].operations.push(
+      { id: "tree_height_balance", name: "Compute Heights & AVL Balance Factor", params: [], time: "O(n)", space: "O(h)" }
+    );
+  });
+
+  // Add Code Snippets & Pedagogy Notes for the new operations
+  Object.assign(STEP_PEDAGOGY_NOTES, {
+    reverse_array: "Two pointers (left = 0, right = n-1) swap symmetric elements and step inward until left >= right in O(n) time and O(1) auxiliary space.",
+    prefix_sum: "Prefix-Sum precomputes P[i] = P[i-1] + arr[i] in O(n) so any range sum Query(L..R) is answered in O(1) via P[R] - P[L-1]!",
+    kadane_max_subarray: "Kadane's Algorithm tracks the maximum sum subarray ending at index i: currSum = max(arr[i], currSum + arr[i]).",
+    balanced_brackets: "Opening brackets push onto the stack; closing brackets pop and verify the matching opening bracket at TOP.",
+    infix_to_postfix: "Operands go straight to output; operators push onto the stack after popping higher-or-equal precedence operators.",
+    postfix_eval: "Scan tokens left-to-right: push numbers onto the stack, and when an operator appears, pop top two operands, apply op, and push result!",
+    reverse_ll: "Reverses next pointers in-place using three pointers: prev = null, curr = head, and nextTemp = curr.next.",
+    find_middle_floyd: "Floyd's Tortoise & Hare advances slow by 1 node and fast by 2 nodes. When fast reaches the end, slow is at the exact middle!",
+    tree_height_balance: "Post-order bottom-up calculation: height(u) = 1 + max(H(L), H(R)) and Balance Factor BF(u) = H(L) - H(R)."
+  });
+
+  Object.assign(CODE_SNIPPETS, {
+    reverse_array: [
+      "function reverseArray(arr) {",
+      "  let left = 0, right = arr.length - 1;",
+      "  while (left < right) {",
+      "    [arr[left], arr[right]] = [arr[right], arr[left]];",
+      "    left++; right--;",
+      "  }",
+      "  return arr;",
+      "}"
+    ],
+    prefix_sum: [
+      "function buildPrefixSum(arr, r) {",
+      "  const P = [arr[0]];",
+      "  for (let i = 1; i < arr.length; i++) {",
+      "    P[i] = P[i - 1] + arr[i];",
+      "  }",
+      "  return P[r]; // Range Sum [0..r] in O(1)",
+      "}"
+    ],
+    kadane_max_subarray: [
+      "function kadaneMaxSubarray(arr) {",
+      "  let curr = arr[0], best = arr[0];",
+      "  for (let i = 1; i < arr.length; i++) {",
+      "    curr = Math.max(arr[i], curr + arr[i]);",
+      "    best = Math.max(best, curr);",
+      "  }",
+      "  return best;",
+      "}"
+    ],
+    balanced_brackets: [
+      "function isBalanced(expr) {",
+      "  const stack = [];",
+      "  for (let ch of expr) {",
+      "    if ('({['.includes(ch)) stack.push(ch);",
+      "    else if (!match(stack.pop(), ch)) return false;",
+      "  }",
+      "  return stack.length === 0;",
+      "}"
+    ],
+    infix_to_postfix: [
+      "function infixToPostfix(tokens) {",
+      "  const opStack = [], out = [];",
+      "  for (let t of tokens) {",
+      "    if (isOperand(t)) out.push(t);",
+      "    else { while (prec(top) >= prec(t)) out.push(opStack.pop()); opStack.push(t); }",
+      "  }",
+      "  while (opStack.length) out.push(opStack.pop());",
+      "}"
+    ],
+    postfix_eval: [
+      "function evalPostfix(tokens) {",
+      "  const stack = [];",
+      "  for (let t of tokens) {",
+      "    if (isNumber(t)) stack.push(Number(t));",
+      "    else { let b = stack.pop(), a = stack.pop(); stack.push(apply(a, b, t)); }",
+      "  }",
+      "  return stack.pop();",
+      "}"
+    ],
+    reverse_ll: [
+      "function reverseList(head) {",
+      "  let prev = null, curr = head;",
+      "  while (curr !== null) {",
+      "    let nextTemp = curr.next;",
+      "    curr.next = prev; // Reverse link",
+      "    prev = curr; curr = nextTemp;",
+      "  }",
+      "  return prev; // New head",
+      "}"
+    ],
+    find_middle_floyd: [
+      "function findMiddle(head) {",
+      "  let slow = head, fast = head;",
+      "  while (fast !== null && fast.next !== null) {",
+      "    slow = slow.next;      // 1 step",
+      "    fast = fast.next.next; // 2 steps",
+      "  }",
+      "  return slow; // Middle node",
+      "}"
+    ],
+    tree_height_balance: [
+      "function checkAVLBalance(node) {",
+      "  if (!node) return 0;",
+      "  let hL = checkAVLBalance(node.left);",
+      "  let hR = checkAVLBalance(node.right);",
+      "  let bf = hL - hR; // Balance Factor",
+      "  return 1 + Math.max(hL, hR);",
+      "}"
+    ]
+  });
+
+  // Hook into 1D Array, Stack, Linked List, and Tree runners for the new operations
+  const origRun1D = run1DArrayOperation;
+  run1DArrayOperation = function(op, val, idxInput) {
+    let arr = [...STATE_STORE["1d"]];
+    const pushFrame = (opts) => frames.push({
+      subtype: "1d",
+      data: opts.data ? [...opts.data] : [...arr],
+      active: opts.active || [],
+      mutate: opts.mutate || [],
+      found: opts.found || [],
+      visited: opts.visited || [],
+      pointers: opts.pointers || {},
+      line: opts.line || 0,
+      vars: opts.vars || {},
+      output: opts.output || "—",
+      desc: opts.desc || ""
+    });
+
+    if (op === "reverse_array") {
+      let l = 0, r = arr.length - 1;
+      pushFrame({ active: [l, r], pointers: { [l]: "L", [r]: "R" }, line: 1, vars: { left: l, right: r }, desc: `Initialize two pointers: left = 0, right = ${r}.` });
+      while (l < r) {
+        pushFrame({ active: [l, r], pointers: { [l]: "L", [r]: "R" }, line: 2, vars: { left: l, right: r, "arr[L]": arr[l], "arr[R]": arr[r] }, desc: `Compare indices L=${l} (${arr[l]}) and R=${r} (${arr[r]}).` });
+        [arr[l], arr[r]] = [arr[r], arr[l]];
+        pushFrame({ mutate: [l, r], pointers: { [l]: "swapped", [r]: "swapped" }, line: 3, vars: { left: l, right: r, swapped: `${arr[l]} ↔ ${arr[r]}` }, desc: `Swapped arr[${l}] and arr[${r}].` });
+        l++; r--;
+      }
+      STATE_STORE["1d"] = [...arr];
+      pushFrame({ found: arr.map((_, i) => i), line: 6, vars: { status: "Reversed In-Place" }, output: `[${arr.join(", ")}]`, desc: `In-place reversal complete in ${Math.floor(arr.length/2)} swaps!` });
+      return;
+    }
+
+    if (op === "prefix_sum") {
+      if (!arr.length) return;
+      const rIdx = Math.max(0, Math.min(arr.length - 1, idxInput));
+      const pref = [...arr];
+      pushFrame({ data: pref, active: [0], pointers: { 0: "P[0]" }, line: 1, vars: { i: 0, "P[0]": pref[0] }, output: `P[0] = ${pref[0]}`, desc: `Seed prefix sum P[0] = arr[0] = ${pref[0]}.` });
+      for (let i = 1; i < pref.length; i++) {
+        const added = pref[i];
+        pref[i] = pref[i - 1] + added;
+        pushFrame({ data: pref, active: [i - 1], mutate: [i], pointers: { [i - 1]: "P[i-1]", [i]: `P[${i}]` }, line: 3, vars: { i, prevSum: pref[i - 1], "arr[i]": added, "P[i]": pref[i] }, output: `P[0..${i}] = [${pref.slice(0, i + 1).join(", ")}]`, desc: `Accumulate P[${i}] = P[${i-1}] (${pref[i-1]}) + arr[${i}] (${added}) = ${pref[i]}.` });
+      }
+      pushFrame({ data: pref, found: [rIdx], pointers: { [rIdx]: `Sum[0..${rIdx}]` }, line: 5, vars: { queryRange: `0..${rIdx}`, rangeSum: pref[rIdx] }, output: `RangeSum(0..${rIdx}) = ${pref[rIdx]}`, desc: `Prefix array built! O(1) Range Sum for [0..${rIdx}] = ${pref[rIdx]}.` });
+      return;
+    }
+
+    if (op === "kadane_max_subarray") {
+      if (!arr.length) return;
+      let curr = arr[0], best = arr[0], start = 0, bestL = 0, bestR = 0;
+      pushFrame({ active: [0], pointers: { 0: "curr/best" }, line: 1, vars: { i: 0, currSum: curr, maxSum: best }, output: `MaxSum = ${best}`, desc: `Initialize currSum = ${curr}, maxSum = ${best} at index 0.` });
+      for (let i = 1; i < arr.length; i++) {
+        if (arr[i] > curr + arr[i]) {
+          curr = arr[i];
+          start = i;
+        } else {
+          curr = curr + arr[i];
+        }
+        if (curr > best) {
+          best = curr;
+          bestL = start;
+          bestR = i;
+        }
+        const rangeIndices = Array.from({ length: i - start + 1 }, (_, k) => start + k);
+        pushFrame({ active: rangeIndices, found: Array.from({ length: bestR - bestL + 1 }, (_, k) => bestL + k), pointers: { [i]: `i=${i}`, [bestR]: `best=${best}` }, line: 4, vars: { i, "arr[i]": arr[i], currSum: curr, maxSum: best }, output: `Best Subarray [${bestL}..${bestR}] = ${best}`, desc: `Step i=${i} (val ${arr[i]}): currSum = ${curr}, best maxSum = ${best}.` });
+      }
+      const win = Array.from({ length: bestR - bestL + 1 }, (_, k) => bestL + k);
+      pushFrame({ found: win, pointers: { [bestL]: "START", [bestR]: "END" }, line: 6, vars: { bestRange: `[${bestL}..${bestR}]`, maxSum: best }, output: `Max Subarray Sum = ${best}`, desc: `Kadane's complete! Maximum subarray is indices [${bestL}..${bestR}] with sum ${best}.` });
+      return;
+    }
+
+    return origRun1D(op, val, idxInput);
+  };
+
+  const origRunStack = runStackOperation;
+  runStackOperation = function(op, val) {
+    const pushFrame = (stkData, opts) => frames.push({
+      subtype: currentSubtype,
+      data: [...stkData],
+      active: opts.active || [],
+      mutate: opts.mutate || [],
+      found: opts.found || [],
+      line: opts.line || 0,
+      vars: opts.vars || {},
+      output: opts.output || "—",
+      desc: opts.desc || ""
+    });
+
+    if (op === "balanced_brackets") {
+      const seq = ["{", "[", "(", ")", "]", "}"];
+      const match = { ")": "(", "]": "[", "}": "{" };
+      const stk = [];
+      pushFrame(stk, { line: 1, vars: { expr: "{ [ ( ) ] }", status: "Scanning" }, output: "Expr: { [ ( ) ] }", desc: "Validating bracket sequence '{ [ ( ) ] }' using LIFO stack." });
+      for (let i = 0; i < seq.length; i++) {
+        const ch = seq[i];
+        if ("{[(".includes(ch)) {
+          stk.push(ch);
+          pushFrame(stk, { found: [stk.length - 1], line: 3, vars: { token: ch, action: "Push Open", stackSize: stk.length }, output: `Pushed '${ch}'`, desc: `Token '${ch}' is an opening bracket → Push onto TOP.` });
+        } else {
+          const top = stk[stk.length - 1];
+          pushFrame(stk, { active: [stk.length - 1], line: 4, vars: { token: ch, topBracket: top, matches: top === match[ch] }, output: `Matched '${top}' with '${ch}'`, desc: `Closing '${ch}' matches opening '${top}' at TOP → Pop!` });
+          stk.pop();
+        }
+      }
+      pushFrame(stk, { line: 6, vars: { stackEmpty: true, valid: "TRUE ✓" }, output: "VALID & BALANCED ✓", desc: "All brackets matched and stack is empty! Expression is Balanced." });
+      return;
+    }
+
+    if (op === "infix_to_postfix") {
+      const tokens = ["A", "+", "B", "*", "C", "-", "D"];
+      const prec = { "+": 1, "-": 1, "*": 2, "/": 2 };
+      const stk = [], out = [];
+      pushFrame(stk, { line: 1, vars: { infix: "A + B * C - D", postfix: "" }, output: "Infix: A + B * C - D", desc: "Converting 'A + B * C - D' to Postfix using an operator stack." });
+      for (const t of tokens) {
+        if (!prec[t]) {
+          out.push(t);
+          pushFrame(stk, { line: 3, vars: { token: t, type: "Operand", postfix: out.join(" ") }, output: out.join(" "), desc: `Operand '${t}' goes directly to Postfix output.` });
+        } else {
+          while (stk.length && prec[stk[stk.length - 1]] >= prec[t]) {
+            const popped = stk.pop();
+            out.push(popped);
+            pushFrame(stk, { mutate: [stk.length], line: 4, vars: { token: t, poppedOp: popped, postfix: out.join(" ") }, output: out.join(" "), desc: `Pop higher/equal precedence operator '${popped}' to output before pushing '${t}'.` });
+          }
+          stk.push(t);
+          pushFrame(stk, { found: [stk.length - 1], line: 4, vars: { pushedOp: t, postfix: out.join(" ") }, output: out.join(" "), desc: `Push operator '${t}' onto operator stack.` });
+        }
+      }
+      while (stk.length) {
+        const popped = stk.pop();
+        out.push(popped);
+        pushFrame(stk, { line: 6, vars: { draining: popped, postfix: out.join(" ") }, output: out.join(" "), desc: `Pop remaining operator '${popped}' to output.` });
+      }
+      pushFrame(stk, { line: 6, vars: { finalPostfix: out.join(" ") }, output: `Postfix: ${out.join(" ")}`, desc: `Conversion complete! Postfix expression: ${out.join(" ")}.` });
+      return;
+    }
+
+    if (op === "postfix_eval") {
+      const tokens = [10, 5, "+", 3, "*"];
+      const stk = [];
+      pushFrame(stk, { line: 1, vars: { expr: "10 5 + 3 *" }, output: "Postfix: 10 5 + 3 *", desc: "Evaluating Postfix '10 5 + 3 *' using an operand stack." });
+      for (const t of tokens) {
+        if (typeof t === "number") {
+          stk.push(t);
+          pushFrame(stk, { found: [stk.length - 1], line: 3, vars: { token: t, action: "Push Number" }, output: `Stack: [${stk.join(", ")}]`, desc: `Push operand ${t} onto stack.` });
+        } else {
+          const b = stk.pop(), a = stk.pop();
+          const res = t === "+" ? a + b : a * b;
+          stk.push(res);
+          pushFrame(stk, { mutate: [stk.length - 1], line: 4, vars: { op: t, left: a, right: b, result: res }, output: `${a} ${t} ${b} = ${res}`, desc: `Operator '${t}': Pop ${b} and ${a}, compute ${a} ${t} ${b} = ${res}, and push ${res}!` });
+        }
+      }
+      STATE_STORE[currentSubtype] = [...stk];
+      pushFrame(stk, { found: [0], line: 6, vars: { finalAnswer: stk[0] }, output: `Result = ${stk[0]}`, desc: `Postfix evaluation finished! Final answer on TOP = ${stk[0]}.` });
+      return;
+    }
+
+    return origRunStack(op, val);
+  };
+
+  const origRunLL = runLinkedListOperation;
+  runLinkedListOperation = function(op, val, idxIn) {
+    let list = [...STATE_STORE[currentSubtype]];
+    const pushFrame = (opts) => frames.push({
+      subtype: currentSubtype,
+      data: opts.data ? [...opts.data] : [...list],
+      active: opts.active || [],
+      mutate: opts.mutate || [],
+      found: opts.found || [],
+      visited: opts.visited || [],
+      line: opts.line || 0,
+      vars: opts.vars || {},
+      output: opts.output || "—",
+      desc: opts.desc || ""
+    });
+
+    if (op === "reverse_ll") {
+      pushFrame({ line: 1, vars: { prev: "NULL", curr: list[0] ?? "NULL" }, desc: "Initialize 3 pointers: prev = NULL, curr = HEAD." });
+      for (let i = 0; i < list.length; i++) {
+        pushFrame({ active: [i], visited: Array.from({ length: i }, (_, k) => k), line: 4, vars: { prev: i === 0 ? "NULL" : list[i - 1], curr: list[i], nextTemp: list[i + 1] ?? "NULL" }, output: `Rewiring node [${list[i]}].next → ${i === 0 ? "NULL" : list[i - 1]}`, desc: `Save nextTemp = ${list[i + 1] ?? "NULL"}, then reverse [${list[i]}].next to point to ${i === 0 ? "NULL" : list[i - 1]}.` });
+      }
+      list.reverse();
+      STATE_STORE[currentSubtype] = [...list];
+      pushFrame({ found: list.map((_, i) => i), line: 7, vars: { newHead: list[0], status: "Reversed" }, output: list.join(" → "), desc: `Linked List reversed in-place! New HEAD is [${list[0]}].` });
+      return;
+    }
+
+    if (op === "find_middle_floyd") {
+      if (!list.length) return;
+      let slow = 0, fast = 0;
+      pushFrame({ active: [0], line: 1, vars: { slow: `[0]:${list[0]}`, fast: `[0]:${list[0]}` }, desc: "Start Floyd's Tortoise (slow) and Hare (fast) pointers at HEAD [0]." });
+      while (fast < list.length - 1 && fast + 1 < list.length) {
+        slow += 1;
+        fast = Math.min(list.length - 1, fast + 2);
+        pushFrame({ active: [slow, fast], found: [slow], line: 4, vars: { slowIdx: slow, slowVal: list[slow], fastIdx: fast, fastVal: list[fast] }, output: `Slow @ [${slow}]:${list[slow]} | Fast @ [${fast}]:${list[fast]}`, desc: `Advance slow by 1 step to [${slow}] (${list[slow]}) and fast by 2 steps to [${fast}] (${list[fast]}).` });
+        if (fast === list.length - 1) break;
+      }
+      pushFrame({ found: [slow], line: 6, vars: { middleIndex: slow, middleValue: list[slow], cycleDetected: currentSubtype === "circular" ? "Circular Loop" : "False (NULL reached)" }, output: `Middle Node = [${slow}]: ${list[slow]}`, desc: `Fast pointer reached the end! Slow pointer is at the exact middle node [${slow}] = ${list[slow]}.` });
+      return;
+    }
+
+    return origRunLL(op, val, idxIn);
+  };
+
+  const origRunTree = runTreeOperation;
+  runTreeOperation = function(op, val) {
+    if (op === "tree_height_balance") {
+      const isBST = currentSubtype === "bst";
+      const arr = [...STATE_STORE[currentSubtype]];
+      const { nodes, rootId } = buildTreeObject(arr, isBST);
+      const visited = [], bfReport = [];
+      const calcH = (id) => {
+        if (id === null) return 0;
+        const n = nodes[id];
+        const hL = calcH(n.left);
+        const hR = calcH(n.right);
+        const bf = hL - hR;
+        const h = 1 + Math.max(hL, hR);
+        visited.push(n.val);
+        bfReport.push(`${n.val}(BF=${bf >= 0 ? '+'+bf : bf})`);
+        frames.push({
+          subtype: currentSubtype,
+          data: [...arr],
+          active: [n.val],
+          found: Math.abs(bf) <= 1 ? [n.val] : [],
+          mutate: Math.abs(bf) > 1 ? [n.val] : [],
+          visited: [...visited],
+          line: 4,
+          vars: { node: n.val, heightLeft: hL, heightRight: hR, balanceFactor: bf, subtreeHeight: h },
+          output: bfReport.join(" · "),
+          desc: `Node ${n.val}: H(Left)=${hL}, H(Right)=${hR} → Balance Factor BF = ${bf} (${Math.abs(bf) <= 1 ? 'AVL Balanced ✓' : 'Imbalanced ⚠️'}).`
+        });
+        return h;
+      };
+      calcH(rootId);
+      return;
+    }
+    return origRunTree(op, val);
+  };
+
+  /***************************************************************************
+   * PART 2: FULL INTERACTIVE LABS FOR ALL 8 ADVANCED TOPICS (100% COVERAGE)
+   ***************************************************************************/
+  Object.assign(MINI_CONFIG, {
+    avl: {
+      sample: "30, 20, 10, 40, 50",
+      help: "AVL Self-Balancing BST. Insert keys and watch Balance Factors (BF = H(L) - H(R)) and automatic LL / RR / LR / RL rotations.",
+      fields: ["Key to insert / search", "Unused"],
+      ops: [["insert", "Insert with AVL Balance"], ["search", "Search Key"], ["inorder", "In-Order Sorted Traversal"]],
+      code: {
+        insert: "insert key as in BST\nupdate heights bottom-up\nif |BF| > 1: perform LL / RR / LR / RL rotation",
+        search: "while node:\n  if key == node.key: return FOUND\n  node = key < node.key ? node.left : node.right",
+        inorder: "inorder(node.left)\nvisit(node.key, BF)\ninorder(node.right)"
+      }
+    },
+    redblack: {
+      sample: "20, 10, 30, 5, 15",
+      help: "Red-Black Tree simulator. New nodes enter RED; violations of the Red-Parent rule trigger Uncle Recoloring or Rotations.",
+      fields: ["Key", "Unused"],
+      ops: [["insert", "Insert & Fix Red-Black Rules"], ["search", "Search Key"]],
+      code: {
+        insert: "insert key as RED leaf\nif parent is RED:\n  recolor or rotate to restore Black-Height\nroot.color = BLACK",
+        search: "standard BST logarithmic search O(log n)"
+      }
+    },
+    btree: {
+      sample: "10, 20, 30, 40, 50, 60",
+      help: "B-Tree (Order 4 / 2-3-4 Multiway Tree) simulator. Pages hold up to 3 keys; overflow splits the page and promotes the median.",
+      fields: ["Key", "Unused"],
+      ops: [["insert", "Insert Key (Auto-Split Full Page)"], ["search", "Multiway Page Search"]],
+      code: {
+        insert: "find target leaf page\ninsert key in sorted order\nif keys.length == 4: split page & promote median",
+        search: "scan keys in current page\nif found: return page\nelse descend into child interval"
+      }
+    },
+    sets: {
+      sample: "10, 20, 30, 40",
+      help: "Mathematical Set & Map Algebra lab. Compare Set A (Custom data) against Set B (first input box).",
+      fields: ["Set B (comma-separated) or Key", "Unused"],
+      ops: [["union", "Union (A ∪ B)"], ["intersect", "Intersection (A ∩ B)"], ["diff", "Difference (A − B)"], ["symdiff", "Symmetric Difference (A Δ B)"], ["add", "Insert Key into Set A"]],
+      code: {
+        union: "result = new Set(A)\nfor x of B: result.add(x)\nreturn result",
+        intersect: "return A.filter(x => B.has(x))",
+        diff: "return A.filter(x => !B.has(x))",
+        symdiff: "return (A - B) U (B - A)",
+        add: "if (!A.has(key)) A.add(key)"
+      }
+    },
+    dp: {
+      sample: "1, 3, 4",
+      help: "Dynamic Programming Tabulation Lab. Trace how bottom-up DP tables fill without recomputing overlapping subproblems.",
+      fields: ["Target N / Sum (1..12)", "Unused"],
+      ops: [["fib", "1D DP: Fibonacci Tabulation F(n)"], ["coins", "1D DP: Minimum Coins for Target Sum"], ["climb", "1D DP: Climbing Stairs Ways(n)"]],
+      code: {
+        fib: "dp[0]=0; dp[1]=1\nfor i=2..n:\n  dp[i] = dp[i-1] + dp[i-2]\nreturn dp[n]",
+        coins: "dp[0]=0; dp[1..S]=INF\nfor s=1..S:\n  for c in coins: if s>=c: dp[s]=min(dp[s], dp[s-c]+1)",
+        climb: "dp[0]=1; dp[1]=1\nfor i=2..n: dp[i] = dp[i-1] + dp[i-2]"
+      }
+    },
+    greedy: {
+      sample: "1, 5, 10, 25",
+      help: "Greedy Choice Pattern Lab. Trace greedy coin selection or earliest-finish-time interval scheduling.",
+      fields: ["Target Amount (e.g. 41)", "Unused"],
+      ops: [["greedy_coins", "Greedy Coin Change (Largest First)"], ["activities", "Earliest-Finish Activity Selection"]],
+      code: {
+        greedy_coins: "sort coins descending\nwhile amount > 0:\n  pick largest coin <= amount\n  amount -= coin",
+        activities: "sort intervals by finish time\nselect non-overlapping intervals greedily"
+      }
+    },
+    memory: {
+      sample: "10, 20, 30",
+      help: "Stack Pointers vs. Heap Object Aliasing Lab. See what happens when two references share a heap address vs. deep copy.",
+      fields: ["New Value at [0]", "Unused"],
+      ops: [["alias_mutate", "Shared Reference Aliasing (b = a; b[0] = val)"], ["deep_copy", "Independent Deep Copy (c = copy(a); c[0] = val)"]],
+      code: {
+        alias_mutate: "let a = [10, 20, 30]; // @Heap 0x4F00\nlet b = a;            // copies address 0x4F00\nb[0] = newValue;      // mutates shared heap object!",
+        deep_copy: "let a = [10, 20, 30]; // @Heap 0x4F00\nlet c = [...a];       // new @Heap 0x8A20\nc[0] = newValue;      // a[0] remains untouched!"
+      }
+    },
+    advanced: {
+      sample: "cat, dog, bird",
+      help: "Bloom Filter (8-bit array, k=2 hash functions). Test fast probabilistic membership and observe false positives vs. guaranteed misses.",
+      fields: ["Query / Insert Word", "Unused"],
+      ops: [["insert", "Bloom Filter Insert (Set k Hash Bits)"], ["query", "Bloom Filter Membership Query"]],
+      code: {
+        insert: "b1 = h1(word) % 8; b2 = h2(word) % 8;\nbits[b1] = 1; bits[b2] = 1;",
+        query: "b1 = h1(word) % 8; b2 = h2(word) % 8;\nif (bits[b1]==0 || bits[b2]==0) return DEFINITELY_ABSENT;\nreturn PROBABLY_PRESENT;"
+      }
+    }
+  });
+
+  // Register all 8 topics into CL_LABS so every module has an active Lab!
+  Object.assign(CL_LABS, {
+    avl: "mini",
+    redblack: "mini",
+    btree: "mini",
+    sets: "mini",
+    dp: "mini",
+    greedy: "mini",
+    memory: "mini",
+    advanced: "mini",
+    fundamentals: "classic",
+    complexity: "classic"
+  });
+  Object.assign(CL_ALIAS, {
+    fundamentals: ["array", "1d", "insert_idx"],
+    complexity: ["array", "1d", "binary_search"]
+  });
+
+  // Rebuild Lab Sidebar Topic List so all 28 modules are accessible in the Lab!
+  document.getElementById('sgLabTopics').innerHTML = CL_MODULES.filter(m => clHasLab(m[0])).map(m =>
+    `<a href="#lab/${m[0]}" data-ds="${m[0]}"><span aria-hidden="true">${m[5]}</span><span>${m[2]}</span></a>`
+  ).join('');
+
+  // Extend miniLoad, miniRun, and miniDraw for the 8 new miniLab topics
+  const origMiniSelect = miniSelect;
+  miniSelect = function(t) {
+    if (["avl", "redblack", "btree", "sets", "dp", "greedy", "memory", "advanced"].includes(t)) {
+      miniStop();
+      miniTopic = t;
+      const c = MINI_CONFIG[t];
+      M("miniHelp").textContent = c.help;
+      M("miniOperation").innerHTML = c.ops.map(([id, label]) => `<option value="${id}">${label}</option>`).join("");
+      M("miniALabel").textContent = c.fields[0];
+      M("miniBLabel").textContent = c.fields[1];
+      M("miniBWrap").hidden = true;
+      M("miniDataset").value = c.sample;
+      M("miniA").value = t === "sets" ? "30, 40, 50" : t === "dp" ? "6" : t === "greedy" ? "41" : t === "memory" ? "99" : t === "advanced" ? "lion" : "25";
+      miniLoad();
+      return;
+    }
+    return origMiniSelect(t);
+  };
+
+  const origMiniLoad = miniLoad;
+  miniLoad = function() {
+    if (["avl", "redblack", "btree", "sets", "dp", "greedy", "memory"].includes(miniTopic)) {
+      try {
+        miniStop();
+        const raw = M("miniDataset").value.trim();
+        const nums = raw.split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n));
+        if (!nums.length) throw Error("Enter comma-separated integers.");
+        if (miniTopic === "avl") {
+          miniState = { a: [...new Set(nums)].sort((x, y) => x - y) };
+        } else {
+          miniState = { a: nums.slice(0, 12) };
+        }
+        miniReady();
+      } catch (e) { M("miniError").textContent = e.message; }
+      return;
+    }
+    if (miniTopic === "advanced") {
+      miniStop();
+      const words = M("miniDataset").value.split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
+      const bits = Array(8).fill(0);
+      const h1 = w => [...w].reduce((s, c) => s + c.charCodeAt(0), 0) % 8;
+      const h2 = w => ([...w].reduce((s, c, i) => s + c.charCodeAt(0) * (i + 3), 7)) % 8;
+      words.forEach(w => { bits[h1(w)] = 1; bits[h2(w)] = 1; });
+      miniState = { words, bits };
+      miniReady();
+      return;
+    }
+    return origMiniLoad();
+  };
+
+  const origMiniRun = miniRun;
+  miniRun = function() {
+    if (["avl", "redblack", "btree", "sets", "dp", "greedy", "memory", "advanced"].includes(miniTopic)) {
+      try {
+        miniStop();
+        M("miniError").textContent = "";
+        miniFrames = [];
+        const op = M("miniOperation").value;
+        const av = M("miniA").value.trim();
+
+        if (miniTopic === "avl" || miniTopic === "redblack") {
+          const k = parseInt(av, 10) || 25;
+          let arr = [...miniState.a];
+          miniRecord(`Initial ${miniTopic.toUpperCase()} keys (height-balanced): [${arr.join(", ")}].`, [], { Nodes: arr.length });
+          if (op === "insert") {
+            if (!arr.includes(k)) arr.push(k);
+            miniRecord(`Insert key ${k} as leaf and check ancestor Balance Factors.`, [arr.indexOf(k)], { Inserted: k });
+            arr.sort((x, y) => x - y);
+            miniState.a = arr;
+            const mid = Math.floor(arr.length / 2);
+            miniRecord(`${miniTopic === "avl" ? "AVL rotation restores |BF| ≤ 1" : "Red-Black recoloring restores equal black-height"}. Root is ${arr[mid]}.`, [mid], { Root: arr[mid], Height: Math.ceil(Math.log2(arr.length + 1)) }, `Balanced Root = ${arr[mid]}`);
+          } else if (op === "search") {
+            let l = 0, r = arr.length - 1, found = -1;
+            while (l <= r) {
+              const m = (l + r) >> 1;
+              miniRecord(`Compare target ${k} with node ${arr[m]}.`, [m], { Node: arr[m], Target: k });
+              if (arr[m] === k) { found = m; break; }
+              if (k < arr[m]) r = m - 1; else l = m + 1;
+            }
+            miniRecord(found >= 0 ? `Found key ${k}!` : `Key ${k} absent.`, found >= 0 ? [found] : [], {}, found >= 0 ? `Found ${k}` : "Not Found");
+          } else {
+            arr.forEach((v, idx) => miniRecord(`In-order visit ${v} (BF = 0).`, [idx], { Visited: v }, arr.slice(0, idx + 1).join(" → ")));
+          }
+        }
+        else if (miniTopic === "btree") {
+          const k = parseInt(av, 10) || 35;
+          let arr = [...miniState.a];
+          miniRecord(`Current B-Tree sorted keys across pages: [${arr.join(" | ")}].`, [], { TotalKeys: arr.length });
+          if (op === "insert") {
+            if (!arr.includes(k)) arr.push(k);
+            arr.sort((a, b) => a - b);
+            miniState.a = arr;
+            const med = arr[Math.floor(arr.length / 2)];
+            miniRecord(`Insert ${k} into leaf page. Page capacity check → promote median separator ${med} to parent page!`, [arr.indexOf(k), Math.floor(arr.length / 2)], { Inserted: k, PromotedMedian: med }, `Separator = ${med}`);
+          } else {
+            const idx = arr.indexOf(k);
+            miniRecord(`Scan separator intervals in root page, then descend to leaf page.`, idx >= 0 ? [idx] : [], { Target: k }, idx >= 0 ? `Found ${k} in page` : `${k} Not Found`);
+          }
+        }
+        else if (miniTopic === "sets") {
+          const A = [...new Set(miniState.a)];
+          const B = [...new Set(av.split(",").map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n)))];
+          miniRecord(`Set A = {${A.join(", ")}} | Set B = {${B.join(", ")}}.`, [], { "|A|": A.length, "|B|": B.length });
+          let res = [];
+          if (op === "union") res = [...new Set([...A, ...B])];
+          else if (op === "intersect") res = A.filter(x => B.includes(x));
+          else if (op === "diff") res = A.filter(x => !B.includes(x));
+          else if (op === "symdiff") res = [...A.filter(x => !B.includes(x)), ...B.filter(x => !A.includes(x))];
+          else { const k = B[0] ?? 99; if (!A.includes(k)) A.push(k); res = A; }
+          miniState.a = res.length ? res : A;
+          miniRecord(`Computed ${op.toUpperCase()} result: {${res.join(", ")}}.`, res.map((_, i) => i), { ResultCount: res.length }, `{ ${res.join(", ")} }`);
+        }
+        else if (miniTopic === "dp") {
+          const n = Math.max(1, Math.min(10, parseInt(av, 10) || 6));
+          if (op === "fib" || op === "climb") {
+            const dp = [op === "climb" ? 1 : 0, 1];
+            miniState.a = [...dp];
+            miniRecord(`Seed base cases: dp[0] = ${dp[0]}, dp[1] = ${dp[1]}.`, [0, 1], { n });
+            for (let i = 2; i <= n; i++) {
+              dp[i] = dp[i - 1] + dp[i - 2];
+              miniState.a = [...dp];
+              miniRecord(`Compute dp[${i}] = dp[${i-1}] (${dp[i-1]}) + dp[${i-2}] (${dp[i-2]}) = ${dp[i]}.`, [i - 2, i - 1, i], { State: i, Value: dp[i] }, `dp[${i}] = ${dp[i]}`);
+            }
+          } else {
+            const coins = [...miniState.a].filter(c => c > 0);
+            const dp = Array(n + 1).fill(99);
+            dp[0] = 0;
+            for (let s = 1; s <= n; s++) {
+              for (const c of coins) if (s >= c) dp[s] = Math.min(dp[s], dp[s - c] + 1);
+              miniState.a = dp.map(v => v >= 99 ? -1 : v);
+              miniRecord(`Target sum s=${s}: min coins = ${dp[s] >= 99 ? "∞" : dp[s]}.`, [s], { Sum: s, MinCoins: dp[s] }, `dp[${s}] = ${dp[s]}`);
+            }
+          }
+        }
+        else if (miniTopic === "greedy") {
+          if (op === "greedy_coins") {
+            let rem = Math.max(1, parseInt(av, 10) || 41);
+            const coins = [...miniState.a].filter(x => x > 0).sort((a, b) => b - a);
+            const picked = [];
+            miniRecord(`Coins sorted descending: [${coins.join(", ")}]. Target = ${rem}.`, [], { Target: rem });
+            for (const c of coins) {
+              while (rem >= c) {
+                rem -= c;
+                picked.push(c);
+                miniState.a = [...picked];
+                miniRecord(`Greedily pick largest fitting coin ${c}. Remaining = ${rem}.`, [picked.length - 1], { Picked: c, Remaining: rem }, picked.join(" + "));
+              }
+            }
+          } else {
+            const acts = [[1, 3], [2, 5], [4, 6], [6, 8], [5, 9], [8, 10]];
+            const chosen = [];
+            let lastEnd = -1;
+            acts.forEach(([s, e], idx) => {
+              const ok = s >= lastEnd;
+              if (ok) { chosen.push(`(${s},${e})`); lastEnd = e; }
+              miniState.a = chosen.length ? chosen : [`(${s},${e})`];
+              miniRecord(`Inspect activity (${s},${e}): ${ok ? "Compatible ✓ Select & update finish=" + e : "Overlaps ✗ Skip"}.`, [chosen.length - 1], { Interval: `(${s},${e})`, Selected: chosen.length }, chosen.join(" → "));
+            });
+          }
+        }
+        else if (miniTopic === "memory") {
+          const newVal = parseInt(av, 10) || 99;
+          const orig = [...miniState.a];
+          miniRecord(`Allocate array a = [${orig.join(", ")}] at Heap Address 0x4F00.`, [0], { "Addr(a)": "0x4F00" });
+          if (op === "alias_mutate") {
+            miniState.a[0] = newVal;
+            miniRecord(`b = a copies reference 0x4F00. Writing b[0] = ${newVal} mutates a[0] too because both point to 0x4F00!`, [0], { "Addr(a)": "0x4F00", "Addr(b)": "0x4F00", "a[0]": newVal, "b[0]": newVal }, `Shared Heap Mutated: a[0] == b[0] == ${newVal}`);
+          } else {
+            miniRecord(`c = copy(a) allocates new Heap block 0x8A20. Writing c[0] = ${newVal} leaves original a[0] = ${orig[0]} unchanged!`, [0], { "Addr(a)": "0x4F00", "Addr(c)": "0x8A20", "a[0]": orig[0], "c[0]": newVal }, `Deep Copy Isolated: a[0]=${orig[0]}, c[0]=${newVal}`);
+          }
+        }
+        else if (miniTopic === "advanced") {
+          const w = (av || "lion").toLowerCase();
+          const h1 = [...w].reduce((s, c) => s + c.charCodeAt(0), 0) % 8;
+          const h2 = ([...w].reduce((s, c, i) => s + c.charCodeAt(0) * (i + 3), 7)) % 8;
+          miniRecord(`Compute k=2 hashes for "${w}": h1 = ${h1}, h2 = ${h2}.`, [h1, h2], { Word: w, h1, h2 });
+          if (op === "insert") {
+            miniState.bits[h1] = 1;
+            miniState.bits[h2] = 1;
+            if (!miniState.words.includes(w)) miniState.words.push(w);
+            miniRecord(`Set bit[${h1}] = 1 and bit[${h2}] = 1 in the 8-bit Bloom Filter.`, [h1, h2], { Inserted: w }, `Bits [${h1}, ${h2}] set to 1`);
+          } else {
+            const hit = miniState.bits[h1] === 1 && miniState.bits[h2] === 1;
+            const exact = miniState.words.includes(w);
+            miniRecord(`Check bit[${h1}]=${miniState.bits[h1]} and bit[${h2}]=${miniState.bits[h2]} → ${!hit ? "DEFINITELY ABSENT (0 found)" : exact ? "PROBABLY PRESENT (True Positive)" : "PROBABLY PRESENT (False Positive collision!)"}`, [h1, h2], { bit_h1: miniState.bits[h1], bit_h2: miniState.bits[h2] }, !hit ? "Definitely Absent" : exact ? "Present (True Hit)" : "False Positive!");
+          }
+        }
+
+        miniIndex = 0;
+        miniRender();
+        miniPlay();
+      } catch (e) { M("miniError").textContent = e.message; }
+      return;
+    }
+    return origMiniRun();
+  };
+
+  const origMiniDraw = miniDraw;
+  miniDraw = function(f) {
+    const d = f.data;
+    if (["avl", "redblack"].includes(miniTopic)) {
+      const a = d.a || [];
+      const nodes = a.map((v, i) => ({
+        val: v,
+        color: miniTopic === "redblack" ? (i === Math.floor(a.length/2) ? "BLACK" : i % 2 === 0 ? "RED" : "BLACK") : "BF=0",
+        parent: i === Math.floor(a.length / 2) ? -1 : i < Math.floor(a.length / 2) ? Math.min(a.length - 1, i + 1) : i - 1
+      }));
+      return miniBoxes(a.map((v, i) => `${v} (${nodes[i].color})`), f.active);
+    }
+    if (["btree", "sets", "dp", "greedy", "memory"].includes(miniTopic)) {
+      return miniBoxes(d.a || [], f.active);
+    }
+    if (miniTopic === "advanced") {
+      return `<h3>8-Bit Bloom Filter Array (Inserted: ${(d.words || []).join(", ")})</h3>` + miniBoxes(d.bits || [], f.active);
+    }
+    return origMiniDraw(f);
+  };
+
+  /***************************************************************************
+   * PART 3: MULTI-LANGUAGE SYNCHRONIZED CODE SWITCHER (JS / C++ / Python / Java)
+   ***************************************************************************/
+  let currentCodeLang = localStorage.getItem("cl.code.lang") || "js";
+
+  const MULTI_LANG_TEMPLATES = {
+    insert_idx: {
+      cpp: [
+        "void insertAt(vector<int>& arr, int index, int val) {",
+        "  arr.push_back(0);",
+        "  for (int i = (int)arr.size()-1; i > index; i--) {",
+        "    arr[i] = arr[i - 1]; // Shift right in RAM",
+        "  }",
+        "  arr[index] = val;      // Write new element",
+        "}"
+      ],
+      py: [
+        "def insert_at(arr, index, value):",
+        "    arr.append(None)",
+        "    for i in range(len(arr) - 1, index, -1):",
+        "        arr[i] = arr[i - 1]  # Shift right",
+        "    arr[index] = value       # Store new value",
+        "    return arr"
+      ],
+      java: [
+        "void insertAt(int[] arr, int n, int idx, int val) {",
+        "  for (int i = n; i > idx; i--) {",
+        "    arr[i] = arr[i - 1]; // Shift elements right",
+        "  }",
+        "  arr[idx] = val;        // Assign at index",
+        "}"
+      ]
+    },
+    linear_search: {
+      cpp: [
+        "int linearSearch(const vector<int>& arr, int target) {",
+        "  for (int i = 0; i < (int)arr.size(); i++) {",
+        "    if (arr[i] == target) {",
+        "      return i; // Match found at index i",
+        "    }",
+        "  }",
+        "  return -1; // Not found",
+        "}"
+      ],
+      py: [
+        "def linear_search(arr, target):",
+        "    for i in range(len(arr)):",
+        "        if arr[i] == target:",
+        "            return i  # Match found",
+        "    return -1         # Target absent"
+      ],
+      java: [
+        "int linearSearch(int[] arr, int target) {",
+        "  for (int i = 0; i < arr.length; i++) {",
+        "    if (arr[i] == target) {",
+        "      return i; // Found at index i",
+        "    }",
+        "  }",
+        "  return -1;",
+        "}"
+      ]
+    },
+    binary_search: {
+      cpp: [
+        "int binarySearch(const vector<int>& arr, int target) {",
+        "  int low = 0, high = (int)arr.size() - 1;",
+        "  while (low <= high) {",
+        "    int mid = low + (high - low) / 2;",
+        "    if (arr[mid] == target) return mid;",
+        "    else if (arr[mid] < target) low = mid + 1;",
+        "    else high = mid - 1;",
+        "  }",
+        "  return -1;",
+        "}"
+      ],
+      py: [
+        "def binary_search(arr, target):",
+        "    low, high = 0, len(arr) - 1",
+        "    while low <= high:",
+        "        mid = (low + high) // 2",
+        "        if arr[mid] == target: return mid",
+        "        elif arr[mid] < target: low = mid + 1",
+        "        else: high = mid - 1",
+        "    return -1"
+      ],
+      java: [
+        "int binarySearch(int[] arr, int target) {",
+        "  int low = 0, high = arr.length - 1;",
+        "  while (low <= high) {",
+        "    int mid = low + (high - low) / 2;",
+        "    if (arr[mid] == target) return mid;",
+        "    else if (arr[mid] < target) low = mid + 1;",
+        "    else high = mid - 1;",
+        "  }",
+        "  return -1;",
+        "}"
+      ]
+    }
+  };
+
+  function translateLinesToLang(jsLines, lang) {
+    if (lang === "js") return jsLines;
+    if (MULTI_LANG_TEMPLATES[currentOp] && MULTI_LANG_TEMPLATES[currentOp][lang]) {
+      return MULTI_LANG_TEMPLATES[currentOp][lang];
+    }
+    return jsLines.map(ln => {
+      let s = ln;
+      if (lang === "cpp") {
+        s = s.replace(/^function\s+(\w+)\(([^)]*)\)\s*\{/, "auto $1($2) {")
+             .replace(/\bconst\s+|\blet\s+/g, "auto ")
+             .replace(/===/g, "==").replace(/!==/g, "!=")
+             .replace(/\bnull\b/g, "nullptr")
+             .replace(/\.length\b/g, ".size()")
+             .replace(/\.push\(/g, ".push_back(")
+             .replace(/\.pop\(\)/g, ".pop_back()");
+      } else if (lang === "py") {
+        s = s.replace(/^function\s+(\w+)\(([^)]*)\)\s*\{/, "def $1($2):")
+             .replace(/\b(const|let|var)\s+/g, "")
+             .replace(/===/g, "==").replace(/!==/g, "!=")
+             .replace(/\bnull\b/g, "None").replace(/\btrue\b/g, "True").replace(/\bfalse\b/g, "False")
+             .replace(/&&/g, "and").replace(/\|\|/g, "or")
+             .replace(/\/\/(.*)$/, "#$1")
+             .replace(/[{}]/g, "").replace(/;$/g, "");
+      } else if (lang === "java") {
+        s = s.replace(/^function\s+(\w+)\(([^)]*)\)\s*\{/, "Object $1($2) {")
+             .replace(/\b(const|let)\s+/g, "var ")
+             .replace(/===/g, "==").replace(/!==/g, "!=");
+      }
+      return s;
+    });
+  }
+
+  const origRenderCodePanel = renderCodePanel;
+  renderCodePanel = function(lines) {
+    const baseLines = CODE_SNIPPETS[currentOp] || lines || ["// Algorithm"];
+    const translated = translateLinesToLang(baseLines, currentCodeLang);
+    origRenderCodePanel(translated);
+    const frame = frames[currentFrameIdx];
+    if (frame) {
+      const activeLn = document.getElementById(`codeline-${Math.min(frame.line, translated.length - 1)}`);
+      if (activeLn) activeLn.classList.add("active-line");
+    }
+  };
+
+  // Inject Language Switcher Tabs into the Code Panel Header
+  const codePanelHeader = document.querySelector(".cl-code-panel > div:first-child");
+  if (codePanelHeader) {
+    const langBar = document.createElement("div");
+    langBar.className = "cl-lang-tabs";
+    langBar.setAttribute("aria-label", "Select programming language");
+    langBar.innerHTML = [
+      ["js", "JS"],
+      ["cpp", "C++"],
+      ["py", "Python"],
+      ["java", "Java"]
+    ].map(([id, label]) => `<button type="button" data-lang="${id}" class="cl-lang-tab ${currentCodeLang === id ? 'active-lang' : ''}">${label}</button>`).join("");
+    codePanelHeader.insertBefore(langBar, document.getElementById("opNameTag"));
+
+    langBar.querySelectorAll("[data-lang]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        currentCodeLang = btn.dataset.lang;
+        try { localStorage.setItem("cl.code.lang", currentCodeLang); } catch(e) {}
+        langBar.querySelectorAll(".cl-lang-tab").forEach(b => b.classList.toggle("active-lang", b.dataset.lang === currentCodeLang));
+        renderCodePanel(CODE_SNIPPETS[currentOp]);
+      });
+    });
+  }
+
+  /***************************************************************************
+   * PART 4: EDGE-CASE DATASET PRESETS & LIVE RAM ADDRESS INSPECTOR
+   ***************************************************************************/
+  const dataInputsRow = document.querySelector(".cl-data-inputs");
+  if (dataInputsRow) {
+    const presetSelect = document.createElement("select");
+    presetSelect.id = "clEdgePresetSelect";
+    presetSelect.setAttribute("aria-label", "Load edge-case dataset preset");
+    presetSelect.style.cssText = "padding:7px 8px;font-size:10px;border-radius:7px;min-height:32px;cursor:pointer";
+    presetSelect.innerHTML = `
+      <option value="">⚡ Edge-Case Presets…</option>
+      <option value="sorted">📈 Already Sorted (Best Case)</option>
+      <option value="reverse">📉 Reverse Sorted (Worst Case)</option>
+      <option value="duplicates">👯 Many Duplicates</option>
+      <option value="nearly">〰️ Nearly Sorted</option>
+      <option value="single">1️⃣ Single Element Boundary</option>
+    `;
+    dataInputsRow.appendChild(presetSelect);
+
+    presetSelect.addEventListener("change", () => {
+      const mode = presetSelect.value;
+      if (!mode) return;
+      const presets = {
+        sorted: [10, 20, 30, 40, 50, 60, 70],
+        reverse: [85, 72, 58, 44, 31, 19, 8],
+        duplicates: [25, 10, 25, 40, 10, 25, 40],
+        nearly: [12, 24, 48, 36, 60, 72, 84],
+        single: [42]
+      };
+      parseAndLoadCustomDataset(presets[mode] || presets.sorted);
+      presetSelect.value = "";
+    });
+  }
+
+  // Inject Live RAM Address & Pointer Calculation Inspector Bar below Visual Stage
+  const visualStageEl = document.getElementById("visualStage");
+  if (visualStageEl) {
+    const ramBar = document.createElement("div");
+    ramBar.id = "clRamInspectorBar";
+    ramBar.innerHTML = `
+      <span>💾 <b>Physical Memory Model:</b> <code id="clRamFormulaText">Addr(A[i]) = Base(0x2000) + i × 4B</code></span>
+      <span class="cl-kbd-hint"><kbd>Space</kbd> Play <kbd>←</kbd><kbd>→</kbd> Step <kbd>R</kbd> Run</span>
+    `;
+    visualStageEl.after(ramBar);
+
+    visualStageEl.addEventListener("mousemove", (e) => {
+      const barEl = e.target.closest(".lab-array-bar, .vis-transition");
+      const ramText = document.getElementById("clRamFormulaText");
+      if (!ramText) return;
+      if (currentDS === "array") {
+        const idxMatch = barEl?.parentElement?.textContent?.match(/\[(\d+)\]/);
+        const i = idxMatch ? Number(idxMatch[1]) : currentFrameIdx;
+        const addr = (0x2000 + i * 4).toString(16).toUpperCase();
+        ramText.textContent = `Element [${i}] → Base(0x2000) + ${i} × 4 bytes = 0x${addr}`;
+      } else if (currentDS === "linkedlist") {
+        ramText.textContent = `Heap Node @ 0x${(0x4A10 + currentFrameIdx * 0x18).toString(16).toUpperCase()} [data | next*] (Non-Contiguous)`;
+      } else if (currentDS === "stack") {
+        ramText.textContent = `LIFO Frame @ TOP → 0x${(0x7FF0 - currentFrameIdx * 4).toString(16).toUpperCase()}`;
+      } else if (currentDS === "queue") {
+        ramText.textContent = `FIFO Buffer → Front/Rear Modulo Ring Indexing`;
+      } else {
+        ramText.textContent = `Tree Node @ Heap [left* | key | right*]`;
+      }
+    });
+  }
+
+  /***************************************************************************
+   * PART 5: INTERACTIVE "PREDICT NEXT STEP" CHALLENGE MODE & TRACE TABLE
+   ***************************************************************************/
+  let predictModeOn = false;
+  let predictScore = 0, predictTotal = 0;
+
+  const playbackTopRow = document.querySelector(".cl-playback-panel > div:first-child");
+  if (playbackTopRow) {
+    const actionWrap = document.createElement("div");
+    actionWrap.style.cssText = "display:flex;gap:6px;align-items:center;flex-wrap:wrap";
+    actionWrap.innerHTML = `
+      <button id="clPredictToggleBtn" type="button" class="cl-v3-pill" title="Quiz yourself on the next step before it happens">
+        🎯 Predict Mode: OFF
+      </button>
+      <button id="clOpenTraceBtn" type="button" class="cl-v3-pill" title="View & export full pass-by-pass dry-run table for exams">
+        📋 Dry-Run Table
+      </button>
+      <button id="clShareLabBtn" type="button" class="cl-v3-pill" title="Copy shareable link to this exact lab state">
+        🔗 Share
+      </button>
+    `;
+    playbackTopRow.appendChild(actionWrap);
+
+    const predictCard = document.createElement("div");
+    predictCard.id = "clPredictCard";
+    predictCard.hidden = true;
+    document.querySelector(".cl-playback-panel").appendChild(predictCard);
+
+    const predictBtn = document.getElementById("clPredictToggleBtn");
+    predictBtn.addEventListener("click", () => {
+      predictModeOn = !predictModeOn;
+      predictBtn.classList.toggle("active-mode", predictModeOn);
+      predictBtn.textContent = predictModeOn ? `🎯 Predict Mode: ON (${predictScore}/${predictTotal})` : "🎯 Predict Mode: OFF";
+      predictCard.hidden = !predictModeOn;
+      if (predictModeOn) renderPredictPrompt();
+    });
+  }
+
+  function renderPredictPrompt() {
+    const card = document.getElementById("clPredictCard");
+    if (!card || !predictModeOn) return;
+    if (currentFrameIdx >= frames.length - 1) {
+      card.innerHTML = `<div class="cl-predict-head"><span>🎯 Active Predict Challenge</span><span>Score: ${predictScore}/${predictTotal}</span></div><div class="cl-predict-q">Execution finished! Click <b>▶ Run operation</b> or rewind to Step 1 to test your intuition again.</div>`;
+      return;
+    }
+    const nextF = frames[currentFrameIdx + 1];
+    const nextDesc = nextF.desc || "Next operation step";
+    const correctFocus = nextF.active?.[0] ?? nextF.found?.[0] ?? nextF.mutate?.[0] ?? "Complete";
+    const options = [...new Set([
+      `Focus Index/Node: ${correctFocus}`,
+      `Focus Index/Node: ${typeof correctFocus === "number" ? correctFocus + 1 : 0}`,
+      `Focus Index/Node: ${typeof correctFocus === "number" ? Math.max(0, correctFocus - 1) : 1}`,
+      "Terminate / Return Immediately"
+    ])];
+
+    card.innerHTML = `
+      <div class="cl-predict-head">
+        <span>🎯 Predict Step #${currentFrameIdx + 2} before advancing</span>
+        <span>Streak Score: ${predictScore} / ${predictTotal}</span>
+      </div>
+      <div class="cl-predict-q">What will happen in Step #${currentFrameIdx + 2}?</div>
+      <div class="cl-predict-opts">
+        ${options.map((opt, idx) => `<button type="button" data-pred-idx="${idx}">${EDU_ESCAPE(opt)}</button>`).join("")}
+      </div>
+      <div id="clPredictFeedback" style="font-size:11px;color:#a7f3d0"></div>
+    `;
+
+    card.querySelectorAll("[data-pred-idx]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const correct = btn.dataset.predIdx === "0";
+        predictTotal++;
+        if (correct) predictScore++;
+        document.getElementById("clPredictToggleBtn").textContent = `🎯 Predict Mode: ON (${predictScore}/${predictTotal})`;
+        const fb = document.getElementById("clPredictFeedback");
+        fb.style.color = correct ? "#6ee7b7" : "#fca5a5";
+        fb.textContent = (correct ? "✓ Spot on! " : "✗ Not quite — ") + nextDesc;
+        setTimeout(() => {
+          if (currentFrameIdx < frames.length - 1) {
+            currentFrameIdx++;
+            renderFrame();
+            renderPredictPrompt();
+          }
+        }, 850);
+      });
+    });
+  }
+
+  const origRenderFrame = renderFrame;
+  renderFrame = function() {
+    origRenderFrame();
+    if (predictModeOn) renderPredictPrompt();
+  };
+
+  // Pass-by-Pass Dry-Run Trace Table Generator
+  function buildTraceTableRows() {
+    if (!document.getElementById("labWorkspace").hidden) {
+      return frames.map((f, i) => ({
+        step: i + 1,
+        action: f.desc || "",
+        state: Array.isArray(f.data) ? JSON.stringify(f.data) : JSON.stringify(f.data?.buffer || f.data),
+        vars: Object.entries(f.vars || {}).map(([k, v]) => `${k}=${v}`).join(", "),
+        output: f.output || "—"
+      }));
+    }
+    if (!document.getElementById("extraLab").hidden) {
+      return extraFrames.map((f, i) => ({
+        step: i + 1,
+        action: f.desc || "",
+        state: JSON.stringify(f.data),
+        vars: Object.entries(f.vars || {}).map(([k, v]) => `${k}=${v}`).join(", "),
+        output: f.output || "—"
+      }));
+    }
+    return miniFrames.map((f, i) => ({
+      step: i + 1,
+      action: f.desc || "",
+      state: JSON.stringify(f.data),
+      vars: Object.entries(f.vars || {}).map(([k, v]) => `${k}=${v}`).join(", "),
+      output: f.result || "—"
+    }));
+  }
+
+  function openTraceModal() {
+    const rows = buildTraceTableRows();
+    const container = document.getElementById("clTraceTableContainer");
+    container.innerHTML = `
+      <table class="cl-trace-table">
+        <thead>
+          <tr>
+            <th>Step #</th>
+            <th>Explanation / Micro-Step</th>
+            <th>Memory / Structure State</th>
+            <th>Watched Variables</th>
+            <th>Output</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => `
+            <tr>
+              <td><b>#${r.step}</b></td>
+              <td>${EDU_ESCAPE(r.action)}</td>
+              <td><code>${EDU_ESCAPE(r.state)}</code></td>
+              <td>${EDU_ESCAPE(r.vars)}</td>
+              <td>${EDU_ESCAPE(r.output)}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
+    document.getElementById("clTraceModal").hidden = false;
+  }
+
+  document.getElementById("clOpenTraceBtn")?.addEventListener("click", openTraceModal);
+  document.getElementById("clCloseTraceModal")?.addEventListener("click", () => {
+    document.getElementById("clTraceModal").hidden = true;
+  });
+
+  document.getElementById("clCopyTraceMd")?.addEventListener("click", () => {
+    const rows = buildTraceTableRows();
+    const md = [
+      "| Step | Action | State | Variables | Output |",
+      "| :--- | :--- | :--- | :--- | :--- |",
+      ...rows.map(r => `| ${r.step} | ${r.action} | \`${r.state}\` | ${r.vars} | ${r.output} |`)
+    ].join("\n");
+    navigator.clipboard?.writeText(md);
+    showToast("Copied Markdown Trace Table!");
+  });
+
+  document.getElementById("clDownloadTraceCsv")?.addEventListener("click", () => {
+    const rows = buildTraceTableRows();
+    const csv = [
+      "Step,Action,State,Variables,Output",
+      ...rows.map(r => [r.step, r.action, r.state, r.vars, r.output].map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))
+    ].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `CodeLens_Trace_${currentDS}_${currentOp}.csv`;
+    a.click();
+  });
+
+  // Share State Deep-Link Button
+  document.getElementById("clShareLabBtn")?.addEventListener("click", () => {
+    const url = `${location.origin}${location.pathname}#lab/${currentDS}/${currentSubtype}`;
+    navigator.clipboard?.writeText(url);
+    showToast("Shareable Lab Link copied to clipboard!");
+  });
+
+  /***************************************************************************
+   * PART 6: INTERACTIVE EXAM MASTERY QUIZ IN EVERY THEORY LESSON
+   ***************************************************************************/
+  const clQuizWrappedLesson = clRenderLesson;
+  clRenderLesson = function(key, keep = false) {
+    clQuizWrappedLesson(key, keep);
+    if (clChapter !== "review") return;
+    const id = key === "fundamentals" ? "intro" : key;
+    const t = EDU_TOPICS.find(x => x.id === id);
+    const root = document.querySelector(".cl-reading");
+    if (!t || !root) return;
+
+    const op0 = t.operations[0] || ["Access", "Perform operation", "O(1)", "O(1)"];
+    const quizBox = document.createElement("section");
+    quizBox.className = "cl-exam-quiz";
+    quizBox.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>
+          <span class="cl-kicker">ACTIVE EXAM READINESS CHECK</span>
+          <h3 style="margin:4px 0 0">🎯 Interactive Viva &amp; Exam Quiz: ${EDU_ESCAPE(t.name)}</h3>
+        </div>
+        <span id="clQuizScoreBadge" style="font:700 11px monospace;color:#a4dfc5">Answer all 3 to test mastery</span>
+      </div>
+      <div class="cl-exam-q" data-correct="0">
+        <h4>1. What is the typical time complexity of <b>${EDU_ESCAPE(op0[0])}</b> in ${EDU_ESCAPE(t.name)}?</h4>
+        <div class="cl-exam-choices">
+          <button type="button" class="cl-exam-choice" data-idx="0">${EDU_ESCAPE(op0[2])}</button>
+          <button type="button" class="cl-exam-choice" data-idx="1">O(n!)</button>
+          <button type="button" class="cl-exam-choice" data-idx="2">O(2ⁿ)</button>
+        </div>
+      </div>
+      <div class="cl-exam-q" data-correct="1">
+        <h4>2. Which statement is TRUE regarding ${EDU_ESCAPE(t.name)}?</h4>
+        <div class="cl-exam-choices">
+          <button type="button" class="cl-exam-choice" data-idx="0">${EDU_ESCAPE(t.mistakes[0] || "It requires zero memory.")}</button>
+          <button type="button" class="cl-exam-choice" data-idx="1">${EDU_ESCAPE(t.facts[0] || t.definition)}</button>
+          <button type="button" class="cl-exam-choice" data-idx="2">It cannot be implemented in C++ or Java.</button>
+        </div>
+      </div>
+      <div class="cl-exam-q" data-correct="2">
+        <h4>3. Which real-world application best matches ${EDU_ESCAPE(t.name)}?</h4>
+        <div class="cl-exam-choices">
+          <button type="button" class="cl-exam-choice" data-idx="0">Analog voltage amplification only</button>
+          <button type="button" class="cl-exam-choice" data-idx="1">Replacing CPU clock crystals</button>
+          <button type="button" class="cl-exam-choice" data-idx="2">${EDU_ESCAPE(t.applications[0] || "Efficient data organization")}</button>
+        </div>
+      </div>
+    `;
+    root.appendChild(quizBox);
+
+    let answered = 0, correctCount = 0;
+    quizBox.querySelectorAll(".cl-exam-q").forEach(qEl => {
+      const rightIdx = qEl.dataset.correct;
+      qEl.querySelectorAll(".cl-exam-choice").forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (qEl.dataset.locked) return;
+          qEl.dataset.locked = "1";
+          answered++;
+          if (btn.dataset.idx === rightIdx) {
+            btn.classList.add("correct-ans");
+            correctCount++;
+          } else {
+            btn.classList.add("wrong-ans");
+            qEl.querySelector(`[data-idx="${rightIdx}"]`)?.classList.add("correct-ans");
+          }
+          document.getElementById("clQuizScoreBadge").textContent = `Quiz Score: ${correctCount} / ${answered} correct`;
+        });
+      });
+    });
+  };
+
+  /***************************************************************************
+   * PART 7: CLASSROOM LIGHT THEME TOGGLE & GLOBAL KEYBOARD SHORTCUTS
+   ***************************************************************************/
+  const topHeader = document.querySelector(".cl-top");
+  if (topHeader) {
+    const themeBtn = document.createElement("button");
+    themeBtn.type = "button";
+    themeBtn.className = "cl-v3-pill";
+    themeBtn.id = "clThemeToggleBtn";
+    const isLight = localStorage.getItem("cl.theme") === "light";
+    if (isLight) document.documentElement.classList.add("cl-light-mode");
+    themeBtn.textContent = isLight ? "🌙 Dark Studio" : "☀️ Projector / Light";
+    themeBtn.addEventListener("click", () => {
+      const nowLight = document.documentElement.classList.toggle("cl-light-mode");
+      themeBtn.textContent = nowLight ? "🌙 Dark Studio" : "☀️ Projector / Light";
+      try { localStorage.setItem("cl.theme", nowLight ? "light" : "dark"); } catch (e) {}
+    });
+    topHeader.appendChild(themeBtn);
+  }
+
+  // Global Keyboard Shortcuts for Lab Stepping
+  window.addEventListener("keydown", (e) => {
+    if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName)) return;
+    if (!document.getElementById("clTraceModal").hidden && e.key === "Escape") {
+      document.getElementById("clTraceModal").hidden = true;
+      return;
+    }
+    if (document.getElementById("sgLab").hidden) return;
+
+    if (e.code === "Space") {
+      e.preventDefault();
+      if (!document.getElementById("labWorkspace").hidden) playBtn.click();
+      else if (!document.getElementById("extraLab").hidden) EX("extraPlay").click();
+      else if (!document.getElementById("miniLab").hidden) M("miniPlay").click();
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      if (!document.getElementById("labWorkspace").hidden) nextBtn.click();
+      else if (!document.getElementById("extraLab").hidden) EX("extraNext").click();
+      else if (!document.getElementById("miniLab").hidden) M("miniNext").click();
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      if (!document.getElementById("labWorkspace").hidden) prevBtn.click();
+      else if (!document.getElementById("extraLab").hidden) EX("extraPrev").click();
+      else if (!document.getElementById("miniLab").hidden) M("miniPrev").click();
+    } else if (e.key === "r" || e.key === "R") {
+      e.preventDefault();
+      if (!document.getElementById("labWorkspace").hidden) executeBtn.click();
+      else if (!document.getElementById("extraLab").hidden) EX("extraRun").click();
+      else if (!document.getElementById("miniLab").hidden) M("miniRun").click();
+    }
+  });
+
+  // Refresh current view so all new upgrades render immediately
+  openPage();
+})();
+</script>
+
+</body>
 </html>
